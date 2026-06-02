@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jack's Homeschool Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fdf6ee;--card:#fff;--accent1:#ff6b35;--accent2:#4ecdc4;--accent5:#6c63ff;--text:#2d2d2d;--muted:#888;--border:#e8e0d5;--shadow:0 4px 20px rgba(0,0,0,0.08);--radius:16px;--maths:#ff6b35;--english:#6c63ff;--science:#4ecdc4;--geography:#f7b731;--pdhpe:#ee5a92;--aquatic:#45aaf2;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;background-image:radial-gradient(circle at 20% 50%,#ffe66d22 0%,transparent 50%),radial-gradient(circle at 80% 20%,#4ecdc422 0%,transparent 40%);}
+header{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--border);background:white;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.06);flex-wrap:wrap;gap:10px;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo h1{font-family:'Fredoka One',cursive;font-size:22px;color:var(--accent1);}
+.logo span{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.05em;text-transform:uppercase;display:block;margin-top:-2px;}
+nav{display:flex;gap:6px;flex-wrap:wrap;}
+.nav-btn{padding:7px 14px;border-radius:30px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;transition:all .2s;background:transparent;color:var(--muted);}
+.nav-btn.active,.nav-btn:hover{background:var(--accent1);color:white;}
+main{max-width:1100px;margin:0 auto;padding:24px 20px;}
+.page{display:none;animation:fadeIn .3s ease;}.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* CONFIG BAR */
+.config-bar{background:white;border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;border:2px solid var(--border);box-shadow:var(--shadow);display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;}
+.config-field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:180px;}
+.config-field label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);}
+.config-input{padding:9px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;}
+.config-input:focus{outline:none;border-color:var(--accent2);}
+.toggle-row{display:flex;gap:5px;flex-wrap:wrap;}
+.tog-btn{padding:7px 12px;border-radius:20px;border:2px solid var(--border);background:white;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s;}
+.tog-btn.active{border-color:var(--accent1);background:var(--accent1);color:white;}
+.tog-btn:hover:not(.active){border-color:var(--accent1);}
+
+/* WEEK HEADER */
+.week-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.week-header h2{font-family:'Fredoka One',cursive;font-size:24px;}
+.week-dates{color:var(--muted);font-weight:700;font-size:13px;margin-top:2px;}
+.week-nav{display:flex;align-items:center;gap:8px;}
+.week-arrow{width:34px;height:34px;border-radius:50%;border:2px solid var(--border);background:white;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.week-arrow:hover{border-color:var(--accent1);color:var(--accent1);}
+.gen-all-btn{padding:10px 20px;background:var(--accent1);color:white;border:none;border-radius:30px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(255,107,53,.4);transition:all .2s;display:flex;align-items:center;gap:6px;}
+.gen-all-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,107,53,.5);}
+.gen-all-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+/* DAY CARDS */
+.days-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px;}
+@media(max-width:900px){.days-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.days-grid{grid-template-columns:1fr}}
+.day-card{background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:2px solid var(--border);transition:transform .2s;}
+.day-card:hover{transform:translateY(-2px);}
+.day-header{padding:10px 12px;font-family:'Fredoka One',cursive;font-size:16px;color:white;}
+.day-subjects{padding:8px 12px;}
+.subject-pill{display:inline-flex;align-items:center;padding:4px 9px;border-radius:20px;font-size:10px;font-weight:800;margin:2px 2px 2px 0;color:white;text-transform:uppercase;letter-spacing:.04em;}
+.sub-maths{background:var(--maths)}.sub-english{background:var(--english)}.sub-science{background:var(--science)}.sub-geography{background:var(--geography)}.sub-pdhpe{background:var(--pdhpe)}.sub-aquatic{background:var(--aquatic)}
+.day-Mon .day-header{background:linear-gradient(135deg,#667eea,#764ba2)}
+.day-Tue .day-header{background:linear-gradient(135deg,#f093fb,#f5576c)}
+.day-Wed .day-header{background:linear-gradient(135deg,#4facfe,#00f2fe)}
+.day-Thu .day-header{background:linear-gradient(135deg,#43e97b,#38f9d7)}
+.day-Fri .day-header{background:linear-gradient(135deg,#fa709a,#fee140)}
+.day-gen-btn{width:100%;margin:0 12px 10px;width:calc(100% - 24px);padding:7px 0;background:var(--accent1);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;transition:all .2s;}
+.day-gen-btn:hover{background:#e55a25;}
+.day-gen-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ACTIVITY CARDS */
+.activities-section{margin-bottom:28px;}
+.activities-section h2{font-family:'Fredoka One',cursive;font-size:22px;margin-bottom:14px;}
+.activity-card{background:white;border-radius:var(--radius);margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden;border:2px solid var(--border);border-left:5px solid var(--border);}
+.activity-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.activity-header:hover{background:#fafafa;}
+.activity-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.activity-title{font-weight:800;font-size:14px;}
+.activity-code{font-size:11px;color:var(--muted);font-weight:700;font-family:monospace;}
+.expand-icon{color:var(--muted);font-size:16px;transition:transform .2s;flex-shrink:0;}
+.activity-body{display:none;padding:0 16px 16px;border-top:1px solid var(--border);}
+.activity-body.open{display:block;}
+.expand-icon.open{transform:rotate(180deg);}
+.activity-content{padding-top:12px;line-height:1.7;font-size:14px;}
+.activity-content h4{font-weight:800;margin:12px 0 5px;color:var(--accent1);}
+.activity-content ul{padding-left:18px;}
+.activity-content li{margin-bottom:3px;}
+.step{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;}
+.step-num{background:var(--accent1);color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:2px;}
+.explainer-box{background:linear-gradient(135deg,#fff9e6,#fff3cd);border:2px solid #ffe066;border-radius:12px;padding:12px 14px;margin:10px 0;}
+.explainer-box .ex-title{font-weight:800;font-size:13px;color:#856404;margin-bottom:5px;}
+.explainer-box p{font-size:13px;color:#5a4a00;line-height:1.6;}
+.explainer-box .ex-example{background:rgba(255,255,255,.7);border-radius:8px;padding:7px 10px;margin-top:7px;font-family:monospace;font-size:13px;font-weight:700;}
+.adhd-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:800;}
+.adhd-movement{background:#e8f5e9;color:#2e7d32}.adhd-desk{background:#e3f2fd;color:#1565c0}.adhd-creative{background:#f3e5f5;color:#6a1b9a}.adhd-outdoor{background:#fff8e1;color:#f57f17}
+.ia-wrap{border:2px solid var(--accent2);border-radius:12px;overflow:hidden;margin:10px 0;}
+.ia-head{background:var(--accent2);color:white;padding:8px 12px;font-weight:800;font-size:12px;}
+.ia-body{padding:12px;}
+.ia-q{margin-bottom:10px;}
+.ia-q p{font-size:14px;font-weight:700;margin-bottom:5px;}
+.ia-input{padding:7px 10px;border:2px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:13px;width:150px;}
+.ia-input:focus{outline:none;border-color:var(--accent2);}
+.ia-check{padding:7px 14px;background:var(--accent2);color:white;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;margin-left:6px;}
+.ia-fb{margin-top:6px;font-weight:700;font-size:13px;padding:6px 10px;border-radius:8px;display:none;}
+.ia-fb.correct{background:#d4edda;color:#155724;display:block;}.ia-fb.wrong{background:#f8d7da;color:#721c24;display:block;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.complete-btn{padding:8px 16px;border:2px solid var(--accent2);background:white;color:var(--accent2);border-radius:20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;transition:all .2s;}
+.complete-btn:hover{background:var(--accent2);color:white;}
+.complete-btn.done{background:var(--accent2);color:white;pointer-events:none;}
+.skip-btn{padding:8px 16px;border:2px solid #f57f17;background:white;color:#f57f17;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;transition:all .2s;}
+.skip-btn:hover{background:#f57f17;color:white;}
+.carryover-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:10px;font-size:11px;font-weight:800;background:#ffe0b2;color:#e65100;}
+.skipped-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:10px;font-size:11px;font-weight:800;background:#fff3cd;color:#856404;}
+.loading-activity{display:flex;align-items:center;gap:10px;padding:14px 16px;color:var(--muted);font-weight:600;}
+.spinner{width:16px;height:16px;border:3px solid #eee;border-top-color:var(--accent1);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MANUAL ACTIVITY LOG */
+.manual-log-section{background:white;border:2px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px;box-shadow:var(--shadow);}
+.manual-log-section h3{font-family:'Fredoka One',cursive;font-size:20px;margin-bottom:6px;}
+.manual-log-section p{font-size:13px;color:var(--muted);margin-bottom:14px;}
+.manual-input-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.manual-textarea{flex:1;min-width:240px;padding:10px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;resize:none;height:52px;}
+.manual-textarea:focus{outline:none;border-color:var(--accent2);}
+.manual-submit-btn{padding:10px 20px;background:var(--accent5);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.manual-submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+.manual-results{margin-top:14px;}
+.manual-match-card{background:#f8f9ff;border:2px solid #c5cae9;border-radius:12px;padding:12px 14px;margin-bottom:8px;}
+.manual-match-card h4{font-weight:800;font-size:14px;margin-bottom:4px;color:var(--accent5);}
+.manual-match-card p{font-size:13px;color:var(--muted);margin-bottom:8px;}
+.manual-confirm-btn{padding:6px 14px;background:var(--accent5);color:white;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;}
+
+/* GOOGLE SHEETS SYNC */
+.sync-bar{background:white;border:2px solid #34a853;border-radius:var(--radius);padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.sync-info{flex:1;min-width:160px;}
+.sync-info h4{font-weight:800;font-size:14px;color:#1a7a38;margin-bottom:2px;}
+.sync-info p{font-size:12px;color:var(--muted);}
+.sync-status{font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;background:#e6f4ea;color:#1a7a38;white-space:nowrap;}
+.sync-status.error{background:#fce8e6;color:#c5221f;}
+.sync-status.syncing{background:#e8f0fe;color:#1967d2;}
+.gs-btn{padding:8px 16px;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;}
+.gs-push{background:#34a853;color:white;}.gs-push:hover{background:#2d9249;}
+.gs-pull{background:#1a73e8;color:white;}.gs-pull:hover{background:#1557b0;}
+.gs-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* API BANNER */
+.api-banner{background:linear-gradient(135deg,#667eea22,#764ba222);border:2px solid #667eea55;border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.api-key-input{flex:2;min-width:220px;padding:9px 12px;border-radius:10px;border:2px solid #667eea55;font-family:'Nunito',sans-serif;font-size:14px;}
+.api-save-btn{padding:9px 16px;background:var(--accent5);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;}
+.api-status{font-size:12px;margin-top:4px;width:100%;}.api-status.ok{color:#155724;font-weight:700;}
+
+/* STATUS BADGES */
+.status-badge{padding:3px 9px;border-radius:10px;font-size:11px;font-weight:800;white-space:nowrap;text-transform:uppercase;letter-spacing:.04em;}
+.status-not-started{background:#f0f0f0;color:#888}.status-partially{background:#fff3cd;color:#856404}.status-covered{background:#cce5ff;color:#004085}.status-mastered{background:#d4edda;color:#155724}
+
+/* OUTCOMES */
+.outcomes-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.filter-btn{padding:5px 12px;border-radius:20px;border:2px solid var(--border);background:white;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s;color:var(--text);}
+.filter-btn.active{border-color:var(--accent1);background:var(--accent1);color:white;}
+.outcomes-table{width:100%;border-collapse:collapse;}
+.outcomes-table th{text-align:left;padding:10px 12px;background:var(--text);color:white;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;}
+.outcomes-table th:first-child{border-radius:10px 0 0 0}.outcomes-table th:last-child{border-radius:0 10px 0 0}
+.outcomes-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top;}
+.outcomes-table tr:hover td{background:#fafafa}
+.status-select{padding:5px 8px;border-radius:10px;border:2px solid var(--border);font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;background:white;}
+.evidence-input{width:100%;border:2px solid var(--border);border-radius:8px;padding:5px 8px;font-family:'Nunito',sans-serif;font-size:12px;resize:vertical;min-height:36px;}
+.evidence-input:focus{outline:none;border-color:var(--accent2);}
+.save-ev-btn{margin-top:4px;padding:4px 10px;background:var(--accent2);color:white;border:none;border-radius:7px;font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;cursor:pointer;}
+.outcome-code{font-family:monospace;font-size:12px;font-weight:700;color:var(--accent5);}
+
+/* PROGRESS */
+.progress-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
+.progress-card{background:white;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);border:2px solid var(--border);}
+.progress-card h3{font-family:'Fredoka One',cursive;font-size:16px;margin-bottom:8px;}
+.progress-bar-wrap{background:#f0f0f0;border-radius:10px;height:9px;overflow:hidden;margin-bottom:6px;}
+.progress-bar{height:100%;border-radius:10px;transition:width .6s ease;}
+.progress-label{font-size:12px;color:var(--muted);font-weight:700;}
+.progress-breakdown{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;}
+.breakdown-item{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:700;}
+.breakdown-dot{width:8px;height:8px;border-radius:50%;}
+
+/* PARENT NOTES */
+.notes-section{background:white;border:2px solid var(--border);border-radius:var(--radius);padding:18px;margin-top:24px;box-shadow:var(--shadow);}
+.notes-section h3{font-family:'Fredoka One',cursive;font-size:20px;margin-bottom:12px;}
+.notes-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:600px){.notes-grid{grid-template-columns:1fr}}
+.notes-field label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block;margin-bottom:4px;}
+.notes-textarea{width:100%;border:2px solid var(--border);border-radius:10px;padding:9px 11px;font-family:'Nunito',sans-serif;font-size:13px;resize:vertical;min-height:75px;}
+.notes-textarea:focus{outline:none;border-color:var(--accent2);}
+.print-btn{padding:9px 20px;background:var(--text);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;margin-top:12px;transition:all .2s;}
+.print-btn:hover{background:#444;}
+
+/* SETTINGS */
+.settings-card{background:white;border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);border:2px solid var(--border);max-width:580px;margin-bottom:18px;}
+.settings-card h3{font-weight:800;margin-bottom:10px;}
+.settings-card p{font-size:13px;color:var(--muted);margin-bottom:10px;}
+.url-input{width:100%;padding:9px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;margin-bottom:8px;}
+.url-input:focus{outline:none;border-color:#34a853;}
+.btn-green{padding:8px 16px;background:#34a853;color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;}
+.btn-blue{padding:8px 16px;background:#1a73e8;color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;margin-right:8px;}
+.btn-red{padding:8px 16px;border:2px solid #dc3545;background:white;color:#dc3545;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 16px;background:var(--text);color:white;border-radius:12px;font-weight:700;font-size:14px;z-index:9999;animation:toastIn .3s ease,toastOut .3s ease 2.7s forwards;box-shadow:0 8px 24px rgba(0,0,0,.2);}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateY(10px)}}
+
+/* PRINT */
+.print-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease;}
+.print-modal{background:white;border-radius:var(--radius);padding:28px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);max-height:85vh;overflow-y:auto;}
+.print-modal h3{font-family:'Fredoka One',cursive;font-size:22px;margin-bottom:6px;}
+.print-modal p{font-size:13px;color:var(--muted);margin-bottom:18px;}
+.print-section-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 8px;display:block;}
+.print-check-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .15s;}
+.print-check-row:hover{background:#f5f5f5;}
+.print-check-row input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--accent1);}
+.print-check-row label{font-size:14px;font-weight:700;cursor:pointer;flex:1;}
+.print-check-row .pill{font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;color:white;margin-left:4px;}
+.print-modal-btns{display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:2px solid var(--border);}
+.print-go-btn{flex:1;padding:11px;background:var(--accent1);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer;transition:all .2s;}
+.print-go-btn:hover{background:#e55a25;}
+.print-cancel-btn{padding:11px 20px;background:white;color:var(--muted);border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;}
+.print-divider{height:1px;background:var(--border);margin:12px 0;}
+.print-select-all{font-size:12px;font-weight:800;color:var(--accent1);cursor:pointer;background:none;border:none;font-family:'Nunito',sans-serif;padding:0;}
+
+.field-overlay{position:fixed;inset:0;background:#1a2a1a;z-index:2000;display:none;flex-direction:column;font-family:'Nunito',sans-serif;}
+.field-overlay.active{display:flex;}
+.field-top-bar{background:#243324;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:2px solid #3a5c3a;}
+.field-top-bar h2{font-family:'Fredoka One',cursive;font-size:18px;color:#a8e6a8;}
+.field-exit-btn{padding:7px 14px;background:#3a5c3a;color:#a8e6a8;border:none;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;}
+.field-progress-bar{height:5px;background:#3a5c3a;flex-shrink:0;}
+.field-progress-fill{height:100%;background:#43e97b;transition:width .4s ease;}
+.field-content{flex:1;overflow-y:auto;padding:20px 16px;-webkit-overflow-scrolling:touch;}
+.field-subject-badge{display:inline-block;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:800;color:white;margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em;}
+.field-title{font-family:'Fredoka One',cursive;font-size:26px;color:white;margin-bottom:6px;line-height:1.2;}
+.field-meta{font-size:13px;color:#8ab88a;margin-bottom:16px;font-weight:700;}
+.field-explainer{background:#243324;border:2px solid #3a5c3a;border-radius:12px;padding:14px;margin-bottom:16px;}
+.field-explainer .fe-title{font-weight:800;color:#a8e6a8;font-size:14px;margin-bottom:6px;}
+.field-explainer p{color:#c8e6c8;font-size:14px;line-height:1.6;}
+.field-explainer .fe-example{background:#1a2a1a;border-radius:8px;padding:8px 12px;margin-top:8px;font-family:monospace;font-size:13px;color:#43e97b;font-weight:700;}
+.field-steps{margin-bottom:16px;}
+.field-step{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;background:#243324;border-radius:12px;padding:14px;}
+.field-step-num{background:#43e97b;color:#1a2a1a;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;margin-top:1px;}
+.field-step-text{color:white;font-size:16px;line-height:1.5;font-weight:600;}
+.field-step-time{color:#8ab88a;font-size:12px;font-weight:700;margin-top:3px;}
+.field-brain-break{background:#1a3a2a;border:2px solid #43e97b;border-radius:12px;padding:12px 14px;margin-bottom:16px;color:#a8e6a8;font-size:14px;font-weight:700;}
+.field-questions{margin-bottom:16px;}
+.field-q{background:#243324;border-radius:12px;padding:14px;margin-bottom:10px;}
+.field-q p{color:white;font-size:16px;font-weight:700;margin-bottom:10px;}
+.field-q-input{width:100%;padding:12px 14px;background:#1a2a1a;border:2px solid #3a5c3a;border-radius:10px;color:white;font-family:'Nunito',sans-serif;font-size:16px;font-weight:600;}
+.field-q-input:focus{outline:none;border-color:#43e97b;}
+.field-q-check{width:100%;margin-top:8px;padding:12px;background:#3a5c3a;color:#a8e6a8;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer;}
+.field-q-fb{margin-top:8px;padding:10px 12px;border-radius:10px;font-weight:700;font-size:14px;display:none;}
+.field-q-fb.correct{background:#1a4a2a;color:#43e97b;display:block;}
+.field-q-fb.wrong{background:#4a1a1a;color:#ff6b6b;display:block;}
+.field-bottom-bar{background:#243324;border-top:2px solid #3a5c3a;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;}
+.field-nav-btn{padding:14px 20px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer;flex:1;text-align:center;}
+.field-prev{background:#3a5c3a;color:#a8e6a8;}
+.field-next{background:#43e97b;color:#1a2a1a;}
+.field-complete-btn{width:100%;padding:16px;border-radius:12px;border:2px solid #43e97b;background:transparent;color:#43e97b;font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;cursor:pointer;margin-top:4px;}
+.field-complete-btn.done{background:#43e97b;color:#1a2a1a;}
+.field-counter{color:#8ab88a;font-size:13px;font-weight:700;white-space:nowrap;padding:0 4px;}
+@media print{
+  header,nav,.config-bar,.week-nav,.gen-all-btn,.api-banner,.complete-btn,.skip-btn,
+  .ia-check,.sync-bar,.nav-btn,.day-gen-btn,.manual-log-section,
+  .expand-icon,.btn-row,.print-btn,.print-modal-overlay{display:none !important;}
+  .activity-body{display:block !important;}
+  .activity-card{break-inside:avoid;border:1px solid #ddd !important;margin-bottom:10px;box-shadow:none !important;}
+  .activity-header{cursor:default;}
+  body{background:white !important;font-size:12px;}
+  .page{display:none !important;}
+  #page-generate{display:block !important;}
+  .print-title{display:block !important;}
+  .days-grid{display:none !important;}
+  .activities-section{display:block !important;}
+  .print-week-banner{display:block !important;}
+  main{padding:0 !important;}
+  .explainer-box{border:1px solid #ffe066 !important;box-shadow:none !important;}
+  .ia-wrap{border:1px solid #ccc !important;}
+  .ia-input{border:1px solid #ccc !important;width:120px;}
+  h2{font-size:16px !important;}
+}
+.print-title{display:none;font-family:'Fredoka One',cursive;font-size:20px;margin-bottom:14px;}
+.print-week-banner{display:none;background:#2d2d2d;color:white;padding:12px 20px;border-radius:10px;margin-bottom:16px;font-family:'Fredoka One',cursive;font-size:18px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <span style="font-size:26px">📚</span>
+    <div><h1>Jack's Homeschool Hub</h1><span>NSW Stage 4 · Google Sheets Sync</span></div>
+  </div>
+  <nav>
+    <button class="nav-btn active" onclick="showPage('generate',this)">🗓 Week Plan</button>
+    <button class="nav-btn" onclick="showPage('outcomes',this)">🎯 Outcomes</button>
+    <button class="nav-btn" onclick="showPage('progress',this)">📊 Progress</button>
+    <button class="nav-btn" onclick="showPage('settings',this)">⚙️ Settings</button>
+    <button class="nav-btn" id="fieldModeBtn" onclick="enterFieldMode()" style="background:#43e97b;color:#1a5c2a;font-weight:800">&#127807; Field Mode</button>
+  </nav>
+</header>
+<main>
+
+<!-- GENERATE PAGE -->
+<div class="page active" id="page-generate">
+  <div class="api-banner" id="api-banner">
+    <span style="font-weight:700;font-size:14px;flex:1;min-width:160px">🤖 Enter your Anthropic API key to generate activities</span>
+    <input class="api-key-input" id="apiKeyInput" type="password" placeholder="sk-ant-api03-...">
+    <button class="api-save-btn" onclick="saveApiKey()">Save Key</button>
+    <div class="api-status" id="apiStatus"></div>
+  </div>
+
+  <div class="sync-bar" id="syncBar" style="display:none">
+    <div style="font-size:26px">📊</div>
+    <div class="sync-info"><h4>Google Sheets Sync</h4><p id="syncLastTime">Never synced</p></div>
+    <span class="sync-status" id="syncStatus">Ready</span>
+    <button class="gs-btn gs-pull" id="pullBtn" onclick="pullFromSheets()">⬇ Pull from Sheets</button>
+    <button class="gs-btn gs-push" id="pushBtn" onclick="pushToSheets()">⬆ Push to Sheets</button>
+  </div>
+
+  <div class="config-bar">
+    <div class="config-field" style="flex:2;min-width:200px;">
+      <label>🎯 Jack's Current Hyperfocus (optional)</label>
+      <input class="config-input" id="hyperfocusInput" type="text" placeholder="e.g. fishing, Pokémon, martial arts…" oninput="state.hyperfocus=this.value;saveState()">
+    </div>
+    <div class="config-field">
+      <label>⚡ Energy Level</label>
+      <div class="toggle-row" id="energyRow">
+        <button class="tog-btn active" onclick="setToggle('energy','mixed',this)">🔀 Mixed</button>
+        <button class="tog-btn" onclick="setToggle('energy','high',this)">🚀 High</button>
+        <button class="tog-btn" onclick="setToggle('energy','low',this)">🛋 Calm</button>
+      </div>
+    </div>
+    <div class="config-field">
+      <label>🌤 Location</label>
+      <div class="toggle-row" id="locationRow">
+        <button class="tog-btn active" onclick="setToggle('location','either',this)">🔀 Either</button>
+        <button class="tog-btn" onclick="setToggle('location','indoors',this)">🏠 Indoors</button>
+        <button class="tog-btn" onclick="setToggle('location','outdoors',this)">🌿 Outdoors</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="week-header">
+    <div>
+      <div class="print-title" id="printTitle"></div>
+      <h2>📅 Weekly Plan</h2>
+      <div class="week-dates" id="weekDates"></div>
+    </div>
+    <div class="week-nav">
+      <button class="week-arrow" onclick="changeWeek(-1)">←</button>
+      <button class="week-arrow" onclick="changeWeek(1)">→</button>
+      <button class="gen-all-btn" onclick="generateAllDays()" id="generateBtn">✨ Generate All Days</button>
+    </div>
+  </div>
+
+  <div class="print-week-banner" id="printWeekBanner"></div>
+  <div class="days-grid" id="daysGrid"></div>
+
+  <div class="activities-section" id="activitiesSection" style="display:none">
+    <h2>🎒 This Week's Activities</h2>
+    <div id="activitiesList"></div>
+  </div>
+
+  <!-- MANUAL ACTIVITY LOG -->
+  <div class="manual-log-section">
+    <h3>📋 Log a Real-Life Activity</h3>
+    <p>Did Jack do something outside the app that covers an outcome? Describe it briefly and we'll match it to the right outcomes.</p>
+    <div class="manual-input-row">
+      <textarea class="manual-textarea" id="manualActivityInput" placeholder="e.g. We went fishing and Jack measured and compared the lengths of fish he caught…"></textarea>
+      <button class="manual-submit-btn" id="manualSubmitBtn" onclick="matchManualActivity()">🔍 Match Outcomes</button>
+    </div>
+    <div class="manual-results" id="manualResults"></div>
+  </div>
+
+  <div class="notes-section">
+    <h3>📝 Parent / Teacher Notes</h3>
+    <div class="notes-grid">
+      <div class="notes-field"><label>Weekly Observations</label><textarea class="notes-textarea" id="noteObservations" placeholder="How did Jack go this week?" oninput="saveNotes()"></textarea></div>
+      <div class="notes-field"><label>ADHD / Focus Notes</label><textarea class="notes-textarea" id="noteAdhd" placeholder="Energy levels, what strategies helped…" oninput="saveNotes()"></textarea></div>
+      <div class="notes-field"><label>Next Week Focus</label><textarea class="notes-textarea" id="noteNextWeek" placeholder="Outcomes to revisit…" oninput="saveNotes()"></textarea></div>
+      <div class="notes-field"><label>Highlights / Wins 🌟</label><textarea class="notes-textarea" id="noteWins" placeholder="Things Jack did great…" oninput="saveNotes()"></textarea></div>
+    </div>
+    <button class="print-btn" onclick="printActivities()">🖨 Print / Save as PDF</button>
+  </div>
+</div>
+
+<!-- OUTCOMES PAGE -->
+<div class="page" id="page-outcomes">
+  <div style="margin-bottom:18px">
+    <h2 style="font-family:'Fredoka One',cursive;font-size:26px;margin-bottom:5px">🎯 Outcomes Tracker</h2>
+    <p style="color:var(--muted);font-size:13px;font-weight:600">Track Jack's NSW Stage 4 outcomes. Pull from Google Sheets to restore anytime.</p>
+  </div>
+  <div class="outcomes-filters" id="outcomesFilters"></div>
+  <div style="overflow-x:auto">
+    <table class="outcomes-table">
+      <thead><tr><th>Code</th><th>Outcome</th><th>Status</th><th>Evidence / Notes</th><th>Updated</th></tr></thead>
+      <tbody id="outcomesBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PROGRESS PAGE -->
+<div class="page" id="page-progress">
+  <div style="margin-bottom:22px">
+    <h2 style="font-family:'Fredoka One',cursive;font-size:26px;margin-bottom:5px">📊 Jack's Progress</h2>
+    <p style="color:var(--muted);font-size:13px;font-weight:600">Snapshot across all Stage 4 outcomes.</p>
+  </div>
+  <div class="progress-grid" id="progressGrid"></div>
+</div>
+
+<!-- SETTINGS PAGE -->
+<div class="page" id="page-settings">
+  <h2 style="font-family:'Fredoka One',cursive;font-size:26px;margin-bottom:18px">⚙️ Settings</h2>
+  <div class="settings-card">
+    <h3>🤖 Anthropic API Key</h3>
+    <p>Stored locally in your browser only.</p>
+    <input class="url-input" id="apiKeySettings" type="password" placeholder="sk-ant-api03-...">
+    <button class="btn-blue" onclick="saveApiKeySettings()">Save Key</button>
+    <p style="margin-top:8px;font-size:12px">Get a key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent5)">console.anthropic.com</a></p>
+  </div>
+  <div class="settings-card">
+    <h3>📊 Google Sheets Sync</h3>
+    <p>Paste your Google Apps Script Web App URL here. See the setup guide for instructions.</p>
+    <input class="url-input" id="sheetsUrlInput" placeholder="https://script.google.com/macros/s/YOUR_ID/exec">
+    <button class="btn-green" onclick="saveSheetsUrl()">Save URL</button>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="gs-btn gs-push" onclick="pushToSheets()">⬆ Push to Sheets Now</button>
+      <button class="gs-btn gs-pull" onclick="pullFromSheets()">⬇ Pull from Sheets Now</button>
+    </div>
+    <div id="settingsSyncStatus" style="margin-top:8px;font-size:13px;font-weight:700"></div>
+  </div>
+  <div class="settings-card">
+    <h3>💾 Local Data Backup</h3>
+    <p>Export all data as JSON. Import to restore.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-blue" onclick="exportData()">📥 Export JSON</button>
+      <label style="padding:8px 16px;border:2px solid #34a853;background:white;color:#34a853;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">
+        📤 Import JSON<input type="file" accept=".json" style="display:none" onchange="importData(event)">
+      </label>
+      <button class="btn-red" onclick="clearAllData()">🗑 Clear All</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- FIELD MODE OVERLAY -->
+<div class="field-overlay" id="fieldOverlay">
+  <div class="field-top-bar">
+    <div>
+      <h2 id="fieldDayTitle">Field Mode</h2>
+      <div style="font-size:11px;color:#8ab88a;font-weight:700;margin-top:1px" id="fieldSubTitle"></div>
+    </div>
+    <button class="field-exit-btn" onclick="exitFieldMode()">Exit</button>
+  </div>
+  <div class="field-progress-bar"><div class="field-progress-fill" id="fieldProgressFill" style="width:0%"></div></div>
+  <div class="field-content" id="fieldContent"></div>
+  <div class="field-bottom-bar">
+    <button class="field-nav-btn field-prev" id="fieldPrevBtn" onclick="fieldNav(-1)">Back</button>
+    <span class="field-counter" id="fieldCounter"></span>
+    <button class="field-nav-btn field-next" id="fieldNextBtn" onclick="fieldNav(1)">Next</button>
+  </div>
+</div>
+
+<!-- PRINT MODAL -->
+<div class="print-modal-overlay" id="printModal" style="display:none" onclick="if(event.target===this)closePrintModal()">
+  <div class="print-modal">
+    <h3>🖨 Print / Save as PDF</h3>
+    <p>Choose exactly what to include in your printout.</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <span class="print-section-label" style="margin:0">Activities</span>
+      <button class="print-select-all" onclick="selectAllActivities()">Select all</button>
+    </div>
+    <div id="printActivityChecks"></div>
+    <div class="print-divider"></div>
+    <span class="print-section-label">Other sections</span>
+    <div class="print-check-row">
+      <input type="checkbox" id="printNotes" checked>
+      <label for="printNotes">📝 Parent / Teacher Notes</label>
+    </div>
+    <div class="print-modal-btns">
+      <button class="print-cancel-btn" onclick="closePrintModal()">Cancel</button>
+      <button class="print-go-btn" onclick="executePrint()">🖨 Print Now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// STATIC DATA
+// ============================================================
+const SCHEDULE={Monday:['Maths','English','Science'],Tuesday:['Maths','English','Geography'],Wednesday:['Maths','English','PDHPE'],Thursday:['Maths','English','Aquatic Technology'],Friday:['Maths','English']};
+const OUTCOMES=[
+  {subject:'Maths',code:'MA4-INT-C-01',desc:'Compares, orders and calculates with integers to solve problems'},
+  {subject:'Maths',code:'MA4-FRC-C-01',desc:'Represents and operates with fractions, decimals and percentages to solve problems'},
+  {subject:'Maths',code:'MA4-RAT-C-01',desc:'Solves problems involving ratios and rates, and analyses distance-time graphs'},
+  {subject:'Maths',code:'MA4-ALG-C-01',desc:'Generalises number properties to operate with algebraic expressions including expansion and factorisation'},
+  {subject:'Maths',code:'MA4-IND-C-01',desc:'Operates with primes and roots, positive-integer and zero indices'},
+  {subject:'Maths',code:'MA4-EQU-C-01',desc:'Solves linear and quadratic equations'},
+  {subject:'Maths',code:'MA4-LIN-C-01',desc:'Creates and displays number patterns and finds graphical solutions to linear relationships'},
+  {subject:'Maths',code:'MA4-LEN-C-01',desc:'Applies knowledge of perimeter of plane shapes and circumference of circles'},
+  {subject:'Maths',code:'MA4-PYT-C-01',desc:"Applies Pythagoras' theorem to solve problems"},
+  {subject:'Maths',code:'MA4-ARE-C-01',desc:'Applies knowledge of area and composite area involving triangles, quadrilaterals and circles'},
+  {subject:'Maths',code:'MA4-VOL-C-01',desc:'Applies knowledge of volume and capacity involving right prisms and cylinders'},
+  {subject:'Maths',code:'MA4-ANG-C-01',desc:'Applies angle relationships including transversals on parallel lines'},
+  {subject:'Maths',code:'MA4-GEO-C-01',desc:'Identifies and applies properties of triangles and quadrilaterals'},
+  {subject:'Maths',code:'MA4-DAT-C-01',desc:'Classifies and displays data using a variety of graphical representations'},
+  {subject:'Maths',code:'MA4-DAT-C-02',desc:'Analyses simple datasets using measures of centre, range and shape'},
+  {subject:'Maths',code:'MA4-PRO-C-01',desc:'Solves problems involving probabilities of simple chance experiments'},
+  {subject:'English',code:'EN4-RVL-01',desc:'Uses a range of personal, creative and critical strategies to read complex texts'},
+  {subject:'English',code:'EN4-URA-01',desc:'Analyses how meaning is created through language forms, features and structures'},
+  {subject:'English',code:'EN4-URB-01',desc:'Examines and explains how texts represent ideas, experiences and values'},
+  {subject:'English',code:'EN4-URC-01',desc:'Identifies and explains ways of valuing texts and connections between them'},
+  {subject:'English',code:'EN4-ECA-01',desc:'Creates personal, creative and critical texts for a range of audiences'},
+  {subject:'English',code:'EN4-ECB-01',desc:'Uses processes of planning, monitoring, revising and reflecting to compose texts'},
+  {subject:'Science',code:'SC4-WS-01',desc:'Observing: uses scientific tools and instruments'},
+  {subject:'Science',code:'SC4-WS-02',desc:'Questioning and predicting: identifies questions and makes predictions'},
+  {subject:'Science',code:'SC4-WS-03',desc:'Planning investigations: plans safe and valid investigations'},
+  {subject:'Science',code:'SC4-WS-04',desc:'Conducting investigations: follows planned procedures safely'},
+  {subject:'Science',code:'SC4-WS-05',desc:'Processing data: uses a variety of ways to process and represent data'},
+  {subject:'Science',code:'SC4-WS-06',desc:'Analysing data: identifies trends, patterns and draws conclusions'},
+  {subject:'Science',code:'SC4-WS-07',desc:'Problem-solving: identifies strategies and proposes solutions'},
+  {subject:'Science',code:'SC4-WS-08',desc:'Communicating: communicates scientific concepts using varied forms'},
+  {subject:'Science',code:'SC4-OTU-01',desc:'Explains how observations increase knowledge of the Universe'},
+  {subject:'Science',code:'SC4-FOR-01',desc:'Describes the effects of forces in everyday contexts'},
+  {subject:'Science',code:'SC4-CLS-01',desc:'Describes unique features of cells and how structural features classify organisms'},
+  {subject:'Science',code:'SC4-SOL-01',desc:'Explains how properties of substances enable separation techniques'},
+  {subject:'Science',code:'SC4-LIV-01',desc:'Describes the role, structure and function of living systems'},
+  {subject:'Science',code:'SC4-PRT-01',desc:'Explains how uses of elements and compounds relate to their properties'},
+  {subject:'Science',code:'SC4-CHG-01',desc:'Explains how energy causes geological and chemical change'},
+  {subject:'Science',code:'SC4-DA1-01',desc:'Explains how data is used to model and predict scientific phenomena'},
+  {subject:'PDHPE',code:'PD4-1',desc:'Examines and evaluates strategies to manage current and future challenges'},
+  {subject:'PDHPE',code:'PD4-2',desc:'Examines and demonstrates help-seeking strategies'},
+  {subject:'PDHPE',code:'PD4-3',desc:'Investigates strategies to promote inclusivity, equality and respectful relationships'},
+  {subject:'PDHPE',code:'PD4-4',desc:'Refines, applies and transfers movement skills in dynamic physical activity contexts'},
+  {subject:'PDHPE',code:'PD4-5',desc:'Transfers and adapts solutions to complex movement challenges'},
+  {subject:'PDHPE',code:'PD4-6',desc:'Recognises contextual factors influencing health attitudes and proposes strategies'},
+  {subject:'PDHPE',code:'PD4-7',desc:'Investigates health practices and resources to promote health and physical activity'},
+  {subject:'PDHPE',code:'PD4-8',desc:'Plans for and participates in activities encouraging health and lifetime physical activity'},
+  {subject:'PDHPE',code:'PD4-9',desc:'Demonstrates self-management skills to manage complex situations'},
+  {subject:'PDHPE',code:'PD4-10',desc:'Applies interpersonal skills to help others interact respectfully'},
+  {subject:'PDHPE',code:'PD4-11',desc:'Demonstrates how movement skills can be adapted to enhance performance'},
+  {subject:'Geography',code:'GEE4-1',desc:'Describes diverse features and characteristics of places, environments and activities'},
+  {subject:'Geography',code:'GEE4-2',desc:'Describes geographical processes that form and transform places and environments'},
+  {subject:'Geography',code:'GEE4-3',desc:'Explains patterns associated with natural phenomena and human activity'},
+  {subject:'Geography',code:'GEE4-4',desc:'Describes interactions between people, places and environments impacting sustainability'},
+  {subject:'Geography',code:'GEE4-5',desc:'Describes contemporary geographical issues and events'},
+  {subject:'Geography',code:'GEE4-6',desc:'Discusses perspectives of people and organisations on geographical issues'},
+  {subject:'Geography',code:'GEE4-7',desc:'Examines management strategies of individuals, groups and governments'},
+  {subject:'Aquatic Technology',code:'MAR4-1',desc:'Identifies the nature and scope of the marine and aquatic environment'},
+  {subject:'Aquatic Technology',code:'MAR4-2',desc:'Identifies and describes components of marine ecosystems'},
+  {subject:'Aquatic Technology',code:'MAR4-3',desc:'Investigates attitudes towards the marine environment as a fisheries resource'},
+  {subject:'Aquatic Technology',code:'MAR4-4',desc:'Investigates the effects human activity has had on native fish stocks'},
+  {subject:'Aquatic Technology',code:'MAR4-5',desc:'Identifies the nature and scope of aquaculture'},
+  {subject:'Aquatic Technology',code:'MAR4-6',desc:'Investigates plant and animal species suitable for aquaculture'},
+  {subject:'Aquatic Technology',code:'MAR4-7',desc:'Identifies the need to care for and protect the marine environment'},
+  {subject:'Aquatic Technology',code:'MAR4-8',desc:'Demonstrates sound judgement in personal use of the marine environment'},
+  {subject:'Aquatic Technology',code:'MAR4-9',desc:'Selects, organises, assembles, uses and stores equipment appropriately'},
+  {subject:'Aquatic Technology',code:'MAR4-10',desc:'Interprets and follows instructions with accuracy'},
+  {subject:'Aquatic Technology',code:'MAR4-11',desc:'Identifies employment opportunities in marine and maritime industries'},
+  {subject:'Aquatic Technology',code:'MAR4-12',desc:'Investigates opportunities to join volunteer marine-based service organisations'},
+  {subject:'Aquatic Technology',code:'MAR4-13',desc:'Selects and presents results of appropriate research from varied sources'},
+  {subject:'Aquatic Technology',code:'MAR4-14',desc:'Uses appropriate language, signs and conventions to communicate in marine contexts'},
+];
+const SCOL={Maths:'sub-maths',English:'sub-english',Science:'sub-science',Geography:'sub-geography',PDHPE:'sub-pdhpe','Aquatic Technology':'sub-aquatic'};
+const SCLS={'Not Started':'status-not-started','Partially':'status-partially','Covered':'status-covered','Mastered':'status-mastered'};
+const BCOL={Maths:'#ff6b35',English:'#6c63ff',Science:'#4ecdc4',Geography:'#f7b731',PDHPE:'#ee5a92','Aquatic Technology':'#45aaf2'};
+const ADHDCOL={movement:'adhd-movement',desk:'adhd-desk',creative:'adhd-creative',outdoor:'adhd-outdoor'};
+const ADHDLBL={movement:'🏃 Movement',desk:'📖 Desk',creative:'🎨 Creative',outdoor:'🌿 Outdoor'};
+const STATUS_OPTIONS=['Not Started','Partially','Covered','Mastered'];
+
+// ============================================================
+// STATE
+// ============================================================
+var state={apiKey:'',sheetsUrl:'',outcomes:{},activities:{},currentWeekOffset:0,hyperfocus:'',energy:'mixed',location:'either',weekNotes:{},lastSynced:'',carryOvers:{}};
+
+function loadState(){
+  try{var s=localStorage.getItem('jackHS4');if(s){var p=JSON.parse(s);Object.assign(state,p);}}catch(e){}
+  OUTCOMES.forEach(function(o){
+    if(!state.outcomes[o.code])state.outcomes[o.code]={status:'Not Started',evidence:'',lastUpdated:'',lastActivityTitle:'',lastActivitySummary:'',lastActivityWeek:'',activitiesCount:0};
+  });
+  if(!state.carryOvers)state.carryOvers={};
+}
+function saveState(){try{localStorage.setItem('jackHS4',JSON.stringify(state));}catch(e){}}
+
+// ============================================================
+// WEEK UTILS
+// ============================================================
+function getWeekStart(offset){
+  offset=offset||0;
+  var now=new Date(),day=now.getDay(),diff=now.getDate()-day+(day===0?-6:1);
+  var mon=new Date(now);mon.setDate(diff+offset*7);mon.setHours(0,0,0,0);return mon;
+}
+function getWeekKey(offset){return getWeekStart(offset).toISOString().split('T')[0];}
+function formatWeekRange(offset){
+  var mon=getWeekStart(offset),fri=new Date(mon);fri.setDate(fri.getDate()+4);
+  var o={day:'numeric',month:'short'};
+  return mon.toLocaleDateString('en-AU',o)+' \u2013 '+fri.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+}
+
+// ============================================================
+// DAY / WEEK HELPERS
+// ============================================================
+function isCurrentWeek(){return state.currentWeekOffset===0;}
+function isPastWeek(){return state.currentWeekOffset<0;}
+function isFutureWeek(){return state.currentWeekOffset>0;}
+function isDayPast(dayName){
+  if(isPastWeek())return true;
+  if(isFutureWeek())return false;
+  var days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  var todayJs=new Date().getDay();
+  var todayMon=todayJs===0?5:todayJs-1;
+  return days.indexOf(dayName)<todayMon;
+}
+function isDayToday(dayName){
+  if(!isCurrentWeek())return false;
+  var days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  var todayJs=new Date().getDay();
+  if(todayJs===0||todayJs===6)return false;
+  return days.indexOf(dayName)===(todayJs-1);
+}
+function isCarryOverStillValid(co){
+  if(!co)return false;
+  var levels=['Not Started','Partially','Covered','Mastered'];
+  var currentStatus=(state.outcomes[co.outcomeCode]&&state.outcomes[co.outcomeCode].status)||'Not Started';
+  var skipIdx=levels.indexOf(co.statusAtSkip||'Not Started');
+  var curIdx=levels.indexOf(currentStatus);
+  return curIdx<=skipIdx;
+}
+// ============================================================
+// NAV
+// ============================================================
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(id==='outcomes')renderOutcomes();
+  if(id==='progress')renderProgress();
+}
+
+// ============================================================
+// TOGGLES
+// ============================================================
+function setToggle(type,val,btn){
+  if(type==='energy'){state.energy=val;document.querySelectorAll('#energyRow .tog-btn').forEach(function(b){b.classList.remove('active');});}
+  if(type==='location'){state.location=val;document.querySelectorAll('#locationRow .tog-btn').forEach(function(b){b.classList.remove('active');});}
+  btn.classList.add('active');
+  saveState();
+}
+
+// ============================================================
+// WEEK VIEW
+// ============================================================
+function changeWeek(dir){state.currentWeekOffset+=dir;saveState();renderWeekGrid();renderStoredActivities();loadNotes();}
+
+function renderWeekGrid(){
+  var range=formatWeekRange(state.currentWeekOffset);
+  document.getElementById('weekDates').textContent=range;
+  document.getElementById('printTitle').textContent="Jack's Homeschool - "+range;
+  var grid=document.getElementById('daysGrid');grid.innerHTML='';
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  var existingActs=state.activities[weekKey]||[];
+  var days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  var abbrs=['Mon','Tue','Wed','Thu','Fri'];
+  days.forEach(function(day,i){
+    var subjects=SCHEDULE[day]||[];
+    var dayActs=existingActs.filter(function(a){return a.day===day;});
+    var allDone=dayActs.length>0&&dayActs.every(function(a){return a.completed;});
+    var past=isDayPast(day);
+    var today=isDayToday(day);
+    var hasValidCarry=!past&&subjects.some(function(s){
+      return isCarryOverStillValid(state.carryOvers[day+'|'+s]);
+    });
+    var card=document.createElement('div');
+    card.className='day-card day-'+abbrs[i];
+    if(past)card.style.opacity='0.65';
+    var todayBadge=today?'<span style="font-size:10px;font-weight:800;background:rgba(0,0,0,0.25);color:white;padding:2px 7px;border-radius:8px;margin-left:6px">TODAY</span>':'';
+    var pillsHtml=subjects.map(function(s){return '<span class="subject-pill '+(SCOL[s]||'sub-maths')+'">'+s+'</span>';}).join('');
+    var carryHtml=hasValidCarry?'<div style="font-size:10px;font-weight:800;color:#f57f17;margin-top:4px">&#8629; Carry-over waiting</div>':'';
+    var btnHtml='';
+    if(!isPastWeek()&&!past){
+      var btnLabel=dayActs.length>0?'&#128260; Regenerate Day':'&#9889; Generate Day';
+      btnHtml='<div style="padding:0 10px 10px"><button class="day-gen-btn" data-day="'+day+'" onclick="generateDay(this.dataset.day)">'+btnLabel+'</button></div>';
+    } else if(dayActs.length>0){
+      btnHtml='<div style="padding:0 10px 10px;font-size:11px;color:var(--muted);font-weight:700">&#128338; Past day &#8212; read only</div>';
+    }
+    card.innerHTML='<div class="day-header">&#128197; '+day+todayBadge+(allDone?' &#9989;':'')+'</div>'
+      +'<div class="day-subjects">'+pillsHtml+carryHtml+'</div>'
+      +btnHtml;
+    grid.appendChild(card);
+  });
+}
+
+// ============================================================
+// GENERATE
+// ============================================================
+async function generateAllDays(){
+  if(!state.apiKey){toast('\u26A0\uFE0F Please enter your API key first!');return;}
+  var btn=document.getElementById('generateBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Generating\u2026';
+  var days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  for(var i=0;i<days.length;i++){await generateDay(days[i],true);}
+  btn.disabled=false;btn.innerHTML='\u2728 Generate All Days';
+  toast('\uD83C\uDF89 Full week generated!');
+}
+
+async function generateDay(day,silent){
+  if(!state.apiKey){toast('\u26A0\uFE0F Please enter your API key first!');return;}
+  var dayBtn=document.getElementById('day-gen-'+day);
+  if(!dayBtn){
+    // Button may not have id set, find by data-day
+    var btns=document.querySelectorAll('[data-day="'+day+'"]');
+    if(btns.length)dayBtn=btns[0];
+  }
+  if(dayBtn){dayBtn.disabled=true;dayBtn.textContent='\u23F3 Generating\u2026';}
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  if(!state.activities[weekKey])state.activities[weekKey]=[];
+  var preserved=state.activities[weekKey].filter(function(a){return a.day!==day||a.completed;});
+  var subjects=SCHEDULE[day]||[];
+  var newActs=[];
+  document.getElementById('activitiesSection').style.display='block';
+  for(var si=0;si<subjects.length;si++){
+    var subject=subjects[si];
+    var carryKey=day+'|'+subject;
+    var storedCarry=state.carryOvers[carryKey]||null;
+    var carryOver=isCarryOverStillValid(storedCarry)?storedCarry:null;
+    if(storedCarry&&!carryOver){delete state.carryOvers[carryKey];saveState();}
+    var subjectOutcomes=OUTCOMES.filter(function(o){return o.subject===subject;});
+    var outcome=subjectOutcomes.find(function(o){return (state.outcomes[o.code]&&state.outcomes[o.code].status||'Not Started')!=='Mastered';})||subjectOutcomes[subjectOutcomes.length-1];
+    try{
+      var activity=await callGenerateAPI(day,subject,outcome,carryOver);
+      var act=Object.assign({day:day,subject:subject,outcomeCode:outcome.code,completed:false,skipped:false},activity);
+      if(carryOver){act.carriedOver=true;delete state.carryOvers[carryKey];}
+      newActs.push(act);
+    }catch(e){
+      newActs.push({day:day,subject:subject,outcomeCode:outcome.code,title:'Generation failed \u2014 tap Regenerate',steps:[],completed:false,skipped:false,error:e.message});
+    }
+  }
+  state.activities[weekKey]=preserved.concat(newActs);
+  saveState();
+  renderStoredActivities();
+  renderWeekGrid();
+  if(!silent)toast('\u26A1 '+day+' activities ready!');
+}
+
+async function callGenerateAPI(day,subject,outcome,carryOver){
+  var energyMap={mixed:'could be high-energy/physical OR calm desk-based',high:'should be active and physical, movement-based where possible',low:'should be calm, desk-based or creative'};
+  var locationMap={either:'can be indoors or outdoors',indoors:'MUST be indoors',outdoors:'should be outdoors where possible'};
+  var hyperfocusLine=state.hyperfocus?"\nJack's current passion/hyperfocus: \""+state.hyperfocus+"\". Weave this in naturally where you can — ADHD kids learn best when connected to what they love.":'';
+  var carryLine=carryOver?"\nNOTE: Jack previously skipped an activity on this outcome: \""+carryOver.title+"\". Create a FRESH approach to the same outcome — completely different from the skipped one.":'';
+  var subjectNotes={
+    Maths:'Include a Concept Explainer with a plain-English explanation AND a worked example showing the steps (e.g. for indices: "4 squared means 4 x 4 = 16. Think of it as a grid: 4 rows of 4 dots"). Then give 3-4 practice questions.',
+    English:'Include a How This Works section with a before/after example sentence demonstrating the concept. Provide a self-contained writing or reading task.',
+    Science:'Design a hands-on experiment using household items. Include a Science Behind It section using a simple analogy.',
+    Geography:'Include a Did You Know fact and connect to Australian geography where possible.',
+    PDHPE:'Include a Why This Matters section connecting to real life. If high energy, make it genuinely active.',
+    'Aquatic Technology':'Connect to real fishing, snorkelling or marine activities. Include a Marine Fact about the concept.'
+  };
+  var subjectNote=subjectNotes[subject]||'';
+  var prompt="You are a specialist homeschool teacher who understands ADHD learners well. Design an activity for Jack, Stage 4 student in NSW Australia who has ADHD.\n\nADHD rules — always apply:\n- 4-6 short steps with time estimates\n- Start with the most engaging part first\n- Include a brain break suggestion for halfway\n- Use simple language and worked examples, not walls of text\n- End with something Jack can feel proud of\n- Warm encouraging tone throughout\n\nMATERIALS RULE: Jack lives 30 minutes from town in the bush. ALL materials must be common household items (paper, pens, water, food, sticks, rocks etc). NO specialty items or anything needing a shop.\n"+hyperfocusLine+carryLine+"\n\nEnergy: "+state.energy+" — activity "+energyMap[state.energy]+"\nLocation: "+state.location+" — activity "+locationMap[state.location]+"\nSubject: "+subject+" | Day: "+day+"\nOutcome: "+outcome.code+" — "+outcome.desc+"\nCurrent status: "+((state.outcomes[outcome.code]&&state.outcomes[outcome.code].status)||'Not Started')+"\n\n"+subjectNote+"\n\nReply ONLY with a JSON object, no markdown, no backticks:\n{\"title\":\"short catchy title\",\"adhdStyle\":\"movement or desk or creative or outdoor\",\"duration\":\"e.g. 45 min\",\"brainBreak\":\"2 min movement break idea\",\"conceptExplainer\":{\"heading\":\"What is X?\",\"explanation\":\"plain English 2-3 sentences\",\"example\":\"worked example\"},\"materials\":[\"household item\"],\"steps\":[{\"text\":\"what to do\",\"time\":\"X min\"}],\"practiceQuestions\":[{\"question\":\"Q\",\"answer\":\"A\",\"hint\":\"hint\"}],\"activitySummary\":\"past tense 1-2 sentence summary for records\",\"outcomeLink\":\"one sentence connecting to outcome\",\"hyperfocusConnection\":\"connection to interest or empty string\",\"encouragement\":\"short upbeat line for Jack\"}";
+
+  var response=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':state.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1500,messages:[{role:'user',content:prompt}]})
+  });
+  var data=await response.json();
+  if(!response.ok)throw new Error(data.error&&data.error.message||'API error');
+  var text=data.content.map(function(c){return c.text||'';}).join('');
+  return JSON.parse(text.replace(/```json|```/g,'').trim());
+}
+
+// ============================================================
+// RENDER ACTIVITY CARD
+// ============================================================
+function renderActivityCard(el,act,idx){
+  var statusClass=SCLS[state.outcomes[act.outcomeCode]&&state.outcomes[act.outcomeCode].status]||'status-not-started';
+  var statusLabel=(state.outcomes[act.outcomeCode]&&state.outcomes[act.outcomeCode].status)||'Not Started';
+  var completed=act.completed;
+  var borderColor=BCOL[act.subject]||'#ccc';
+  el.className='activity-card';
+  el.style.borderLeftColor=completed?'var(--accent2)':borderColor;
+  el.style.borderLeftWidth='5px';
+
+  var stepsHtml=(act.steps||[]).map(function(s,i){
+    var t=s.text||s;var tm=s.time?(' <span style="color:var(--muted);font-size:11px">('+s.time+')</span>'):'';
+    return '<div class="step"><div class="step-num">'+(i+1)+'</div><div><strong>'+t+'</strong>'+tm+'</div></div>';
+  }).join('');
+
+  var pqHtml=(act.practiceQuestions||[]).map(function(q,qi){
+    var qText=q.question||'';var ans=(q.answer||'').replace(/'/g,'&#39;');var hint=(q.hint||'').replace(/'/g,'&#39;');
+    return '<div class="ia-q"><p>'+(qi+1)+'. '+qText+'</p>'
+      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'
+      +'<input class="ia-input" type="text" placeholder="Your answer..." id="pq-'+idx+'-'+qi+'">'
+      +'<button class="ia-check" onclick="checkAnswer('+idx+','+qi+',\''+ans+'\',\''+hint+'\')">Check \u2713</button>'
+      +'</div><div class="ia-fb" id="pq-fb-'+idx+'-'+qi+'"></div></div>';
+  }).join('');
+
+  var explHtml='';
+  if(act.conceptExplainer){
+    var ce=act.conceptExplainer;
+    explHtml='<div class="explainer-box"><div class="ex-title">\uD83D\uDCA1 '+(ce.heading||'How it works')+'</div>'
+      +'<p>'+(ce.explanation||'')+'</p>'
+      +(ce.example?'<div class="ex-example">\uD83D\uDCCC '+(ce.example||'')+'</div>':'')
+      +'</div>';
+  }
+  var hfHtml=act.hyperfocusConnection?'<div style="background:#fff9e6;border:2px solid #ffe066;border-radius:10px;padding:9px 12px;margin:8px 0;font-size:13px"><strong>\uD83C\uDFA3 Jack\'s interest:</strong> '+act.hyperfocusConnection+'</div>':'';
+  var bbHtml=act.brainBreak?'<div style="background:#e8f5e9;border:2px solid #a5d6a7;border-radius:10px;padding:9px 12px;margin:8px 0;font-size:13px"><strong>\uD83E\uDDE0 Brain break:</strong> '+act.brainBreak+'</div>':'';
+  var matHtml=act.materials&&act.materials.length?'<h4>\uD83D\uDEE0 What you\'ll need</h4><ul>'+act.materials.map(function(m){return '<li>'+m+'</li>';}).join('')+'</ul>':'';
+  var encHtml=act.encouragement?'<div style="background:linear-gradient(135deg,#667eea22,#764ba222);border-radius:10px;padding:9px 12px;margin-top:10px;font-size:14px;font-weight:700;text-align:center">\uD83C\uDF1F '+act.encouragement+'</div>':'';
+
+  var adhdBadge=act.adhdStyle?'<span class="adhd-badge '+(ADHDCOL[act.adhdStyle]||'')+'">'+(ADHDLBL[act.adhdStyle]||act.adhdStyle)+'</span>':'';
+  var carryBadge=act.carriedOver?'<span class="carryover-tag">\u21A9 Carried over</span>':'';
+  var skipBadge=act.skipped?'<span class="skipped-tag">\u21A9 Carried to next session</span>':'';
+  var doneBadge=completed?'<span style="color:var(--accent2);font-weight:800;font-size:12px">\u2705 Done</span>':'';
+
+  var btnRowHtml='<div class="btn-row">'
+    +'<button class="complete-btn'+(completed?' done':'')+'" onclick="markComplete('+idx+')">'+(completed?'\u2705 Completed!':'\u2713 Mark as Complete')+'</button>'
+    +(!completed&&!act.skipped?'<button class="skip-btn" onclick="skipActivity('+idx+')">\u21A9 Carry Over</button>':'')
+    +skipBadge
+    +'</div>';
+
+  el.innerHTML='<div class="activity-header" onclick="toggleActivity('+idx+')">'
+    +'<div class="activity-meta">'
+    +'<span style="font-size:12px;font-weight:800;color:var(--muted)">'+act.day+'</span>'
+    +'<span class="subject-pill '+(SCOL[act.subject]||'sub-maths')+'" style="font-size:10px">'+act.subject+'</span>'
+    +adhdBadge+carryBadge+doneBadge
+    +'<span class="activity-title">'+(act.title||'Activity')+'</span>'
+    +'<span class="activity-code">'+act.outcomeCode+'</span>'
+    +'<span class="status-badge '+statusClass+'">'+statusLabel+'</span>'
+    +'</div>'
+    +'<span class="expand-icon" id="expand-'+idx+'">\u25BE</span>'
+    +'</div>'
+    +'<div class="activity-body" id="body-'+idx+'">'
+    +'<div class="activity-content">'
+    +'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">'
+    +'<span style="font-size:13px">\u23F1 <strong>'+(act.duration||'45 min')+'</strong></span>'
+    +'<span style="font-size:12px;color:var(--muted)">'+(act.outcomeLink||'')+'</span>'
+    +'</div>'
+    +hfHtml+explHtml+matHtml
+    +'<h4>\uD83D\uDCCB Steps</h4>'+stepsHtml
+    +bbHtml
+    +(pqHtml?'<h4>\u270F\uFE0F Practice</h4><div class="ia-wrap"><div class="ia-head">\uD83C\uDFAE Try these!</div><div class="ia-body">'+pqHtml+'</div></div>':'')
+    +encHtml+btnRowHtml
+    +'</div></div>';
+}
+
+function checkAnswer(actIdx,qIdx,correctAnswer,hint){
+  var input=document.getElementById('pq-'+actIdx+'-'+qIdx);
+  var fb=document.getElementById('pq-fb-'+actIdx+'-'+qIdx);
+  if(!input||!fb)return;
+  var val=input.value.trim().toLowerCase().replace(/\s/g,'');
+  var correct=correctAnswer.trim().toLowerCase().replace(/\s/g,'');
+  if(val===correct||val===correct.replace(/[^0-9.,-]/g,'')){
+    fb.className='ia-fb correct';fb.textContent='\uD83C\uDF89 Correct! Brilliant work Jack!';
+  }else{
+    fb.className='ia-fb wrong';fb.textContent='Not quite \u2014 '+hint+' (Answer: '+correctAnswer+')';
+  }
+}
+
+function toggleActivity(idx){
+  var body=document.getElementById('body-'+idx);var icon=document.getElementById('expand-'+idx);
+  if(body)body.classList.toggle('open');if(icon)icon.classList.toggle('open');
+}
+
+function markComplete(idx){
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  var acts=state.activities[weekKey];
+  if(!acts||!acts[idx])return;
+  acts[idx].completed=true;
+  var code=acts[idx].outcomeCode;
+  var cur=(state.outcomes[code]&&state.outcomes[code].status)||'Not Started';
+  var nextMap={'Not Started':'Partially','Partially':'Covered','Covered':'Mastered','Mastered':'Mastered'};
+  var nextStatus=nextMap[cur]||'Covered';
+  var today=new Date().toLocaleDateString('en-AU');
+  state.outcomes[code]=Object.assign({},state.outcomes[code],{
+    status:nextStatus,lastUpdated:today,
+    lastActivityTitle:acts[idx].title||'',
+    lastActivitySummary:acts[idx].activitySummary||acts[idx].outcomeLink||'',
+    lastActivityWeek:formatWeekRange(state.currentWeekOffset),
+    activitiesCount:((state.outcomes[code]&&state.outcomes[code].activitiesCount)||0)+1
+  });
+  saveState();
+  var cards=document.querySelectorAll('#activitiesList .activity-card');
+  if(cards[idx])renderActivityCard(cards[idx],acts[idx],idx);
+  toast('\uD83C\uDF1F Nice one Jack! '+code+' \u2192 '+nextStatus);
+}
+
+function skipActivity(idx){
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  var acts=state.activities[weekKey];
+  if(!acts||!acts[idx])return;
+  acts[idx].skipped=true;
+  var act=acts[idx];
+  var days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  var di=days.indexOf(act.day);
+  var nextDay=null;
+  for(var d=di+1;d<days.length;d++){if((SCHEDULE[days[d]]||[]).indexOf(act.subject)>=0){nextDay=days[d];break;}}
+  var carryKey=(nextDay||act.day)+'|'+act.subject;
+  var statusAtSkip=(state.outcomes[act.outcomeCode]&&state.outcomes[act.outcomeCode].status)||'Not Started';
+  state.carryOvers[carryKey]={title:act.title,outcomeCode:act.outcomeCode,fromDay:act.day,statusAtSkip:statusAtSkip};
+  saveState();
+  var cards=document.querySelectorAll('#activitiesList .activity-card');
+  if(cards[idx])renderActivityCard(cards[idx],act,idx);
+  renderWeekGrid();
+  toast('\u21A9 Carried over to next '+act.subject+(nextDay?' ('+nextDay+')':''));
+}
+
+function renderStoredActivities(){
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  var acts=state.activities[weekKey];
+  var section=document.getElementById('activitiesSection');
+  var list=document.getElementById('activitiesList');
+  if(!acts||acts.length===0){section.style.display='none';return;}
+  section.style.display='block';list.innerHTML='';
+  acts.forEach(function(act,idx){var el=document.createElement('div');list.appendChild(el);renderActivityCard(el,act,idx);});
+}
+
+// ============================================================
+// MANUAL ACTIVITY MATCHER
+// ============================================================
+async function matchManualActivity(){
+  var input=document.getElementById('manualActivityInput');
+  var desc=input.value.trim();
+  if(!desc){toast('\u26A0\uFE0F Please describe the activity first');return;}
+  if(!state.apiKey){toast('\u26A0\uFE0F Please enter your API key first');return;}
+  var btn=document.getElementById('manualSubmitBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Matching\u2026';
+  var resultsEl=document.getElementById('manualResults');
+  resultsEl.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px 0">Analysing activity\u2026</div>';
+
+  var outcomesJson=JSON.stringify(OUTCOMES.map(function(o){return {code:o.code,subject:o.subject,desc:o.desc};}));
+  var prompt="A homeschool student named Jack completed this real-life activity:\n\""+desc+"\"\n\nHere are all the NSW Stage 4 learning outcomes:\n"+outcomesJson+"\n\nIdentify the 1-3 outcomes this activity MOST clearly covers. Only include outcomes that are genuinely demonstrated.\n\nReply ONLY with a JSON array, no markdown:\n[{\"code\":\"OUTCOME_CODE\",\"subject\":\"Subject\",\"confidence\":\"high or medium\",\"reason\":\"One sentence explaining why this activity covers this outcome\"}]";
+
+  try{
+    var response=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':state.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:600,messages:[{role:'user',content:prompt}]})
+    });
+    var data=await response.json();
+    if(!response.ok)throw new Error(data.error&&data.error.message||'API error');
+    var text=data.content.map(function(c){return c.text||'';}).join('');
+    var matches=JSON.parse(text.replace(/```json|```/g,'').trim());
+    renderManualMatches(matches,desc);
+  }catch(e){
+    resultsEl.innerHTML='<div style="color:#dc3545;font-weight:700;font-size:13px">Error: '+e.message+'</div>';
+  }
+  btn.disabled=false;btn.innerHTML='\uD83D\uDD0D Match Outcomes';
+}
+
+function renderManualMatches(matches,desc){
+  var el=document.getElementById('manualResults');
+  if(!matches||matches.length===0){
+    el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:8px 0">No strong outcome matches found. Try adding more detail to your description.</div>';
+    return;
+  }
+  var html='<div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text)">\uD83C\uDFAF '+matches.length+' outcome'+(matches.length>1?'s':'')+' matched:</div>';
+  matches.forEach(function(m,i){
+    var outcome=OUTCOMES.find(function(o){return o.code===m.code;});
+    if(!outcome)return;
+    var pillClass=SCOL[m.subject]||'sub-maths';
+    html+='<div class="manual-match-card">'
+      +'<h4><span class="subject-pill '+pillClass+'" style="font-size:10px;margin-right:6px">'+m.subject+'</span>'
+      +'<span class="outcome-code">'+m.code+'</span>'
+      +(m.confidence==='high'?' <span style="font-size:11px;color:#155724;font-weight:800">&#10003; High confidence</span>':'')
+      +'</h4>'
+      +'<p>'+outcome.desc+'</p>'
+      +'<p style="color:var(--accent5);font-size:12px;margin-bottom:8px"><em>'+m.reason+'</em></p>'
+      +'<button class="manual-confirm-btn" onclick="confirmManualActivity(\''+m.code+'\',\''+desc.replace(/'/g,'&#39;').replace(/\n/g,' ')+'\')">+ Log this outcome</button>'
+      +'</div>';
+  });
+  el.innerHTML=html;
+}
+
+function confirmManualActivity(code,desc){
+  var cur=(state.outcomes[code]&&state.outcomes[code].status)||'Not Started';
+  var nextMap={'Not Started':'Partially','Partially':'Covered','Covered':'Mastered','Mastered':'Mastered'};
+  var nextStatus=nextMap[cur]||'Covered';
+  var today=new Date().toLocaleDateString('en-AU');
+  state.outcomes[code]=Object.assign({},state.outcomes[code],{
+    status:nextStatus,lastUpdated:today,
+    lastActivityTitle:'Real-life activity',
+    lastActivitySummary:desc.substring(0,120)+(desc.length>120?'...':''),
+    lastActivityWeek:formatWeekRange(state.currentWeekOffset),
+    activitiesCount:((state.outcomes[code]&&state.outcomes[code].activitiesCount)||0)+1
+  });
+  saveState();
+  // Update UI
+  var btn=event.target;btn.textContent='\u2705 Logged!';btn.style.background='#43a047';btn.disabled=true;
+  toast('\uD83C\uDF1F '+code+' \u2192 '+nextStatus+' (from real-life activity)');
+}
+
+// ============================================================
+// NOTES
+// ============================================================
+function loadNotes(){
+  var n=state.weekNotes[getWeekKey(state.currentWeekOffset)]||{};
+  document.getElementById('noteObservations').value=n.observations||'';
+  document.getElementById('noteAdhd').value=n.adhd||'';
+  document.getElementById('noteNextWeek').value=n.nextWeek||'';
+  document.getElementById('noteWins').value=n.wins||'';
+}
+function saveNotes(){
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  state.weekNotes[weekKey]={
+    observations:document.getElementById('noteObservations').value,
+    adhd:document.getElementById('noteAdhd').value,
+    nextWeek:document.getElementById('noteNextWeek').value,
+    wins:document.getElementById('noteWins').value
+  };
+  saveState();
+}
+
+// ============================================================
+// OUTCOMES PAGE
+// ============================================================
+var activeFilter='All';
+function renderOutcomes(){
+  var subjects=['All'].concat([...new Set(OUTCOMES.map(function(o){return o.subject;}))]);
+  document.getElementById('outcomesFilters').innerHTML=subjects.map(function(s){
+    return '<button class="filter-btn'+(s===activeFilter?' active':'')+'" onclick="filterOutcomes(\''+s+'\')">'+s+'</button>';
+  }).join('');
+  var filtered=activeFilter==='All'?OUTCOMES:OUTCOMES.filter(function(o){return o.subject===activeFilter;});
+  document.getElementById('outcomesBody').innerHTML=filtered.map(function(o){
+    var od=state.outcomes[o.code]||{};
+    var statusClass=SCLS[od.status]||'status-not-started';
+    return '<tr>'
+      +'<td><span class="outcome-code">'+o.code+'</span></td>'
+      +'<td><span class="subject-pill '+(SCOL[o.subject]||'sub-maths')+'" style="font-size:10px;margin-bottom:4px;display:inline-block">'+o.subject+'</span><br>'+o.desc+'</td>'
+      +'<td><select class="status-select" onchange="updateStatus(\''+o.code+'\',this.value)">'
+      +STATUS_OPTIONS.map(function(s){return '<option'+(od.status===s?' selected':'')+'>'+s+'</option>';}).join('')
+      +'</select></td>'
+      +'<td>'
+      +'<textarea class="evidence-input" id="ev-'+o.code+'" rows="2" placeholder="Notes or evidence\u2026">'+(od.evidence||'')+'</textarea>'
+      +'<button class="save-ev-btn" onclick="saveEvidence(\''+o.code+'\')">Save</button>'
+      +(od.lastActivityTitle?'<div style="margin-top:5px;font-size:11px;color:var(--muted)">Last: <strong>'+od.lastActivityTitle+'</strong>'+(od.lastActivitySummary?' \u2014 '+od.lastActivitySummary.substring(0,60)+'...':'')+'</div>':'')
+      +'</td>'
+      +'<td style="font-size:12px;color:var(--muted);white-space:nowrap">'+(od.lastUpdated||'\u2014')
+      +(od.lastActivityWeek?'<br><span style="font-size:10px">'+od.lastActivityWeek+'</span>':'')
+      +(od.activitiesCount?'<br><span style="font-size:10px">'+od.activitiesCount+' activit'+(od.activitiesCount===1?'y':'ies')+'</span>':'')
+      +'</td>'
+      +'</tr>';
+  }).join('');
+}
+function filterOutcomes(s){activeFilter=s;renderOutcomes();}
+function updateStatus(code,status){
+  state.outcomes[code]=Object.assign({},state.outcomes[code],{status:status,lastUpdated:new Date().toLocaleDateString('en-AU')});
+  saveState();toast('\u2705 '+code+' \u2192 "'+status+'"');
+}
+function saveEvidence(code){
+  var ev=document.getElementById('ev-'+code);if(!ev)return;
+  state.outcomes[code]=Object.assign({},state.outcomes[code],{evidence:ev.value,lastUpdated:new Date().toLocaleDateString('en-AU')});
+  saveState();toast('\uD83D\uDCBE Notes saved!');
+}
+
+// ============================================================
+// PROGRESS PAGE
+// ============================================================
+function renderProgress(){
+  var subjects=[...new Set(OUTCOMES.map(function(o){return o.subject;}))];
+  var colors={Maths:'#ff6b35',English:'#6c63ff',Science:'#4ecdc4',PDHPE:'#ee5a92',Geography:'#f7b731','Aquatic Technology':'#45aaf2'};
+  document.getElementById('progressGrid').innerHTML=subjects.map(function(subj){
+    var outcomes=OUTCOMES.filter(function(o){return o.subject===subj;});
+    var counts={'Not Started':0,'Partially':0,'Covered':0,'Mastered':0};
+    outcomes.forEach(function(o){var s=(state.outcomes[o.code]&&state.outcomes[o.code].status)||'Not Started';counts[s]=(counts[s]||0)+1;});
+    var done=counts['Covered']+counts['Mastered'];
+    var pct=Math.round(done/outcomes.length*100);
+    var color=colors[subj]||'#888';
+    return '<div class="progress-card"><h3 style="color:'+color+'">'+subj+'</h3>'
+      +'<div class="progress-bar-wrap"><div class="progress-bar" style="width:'+pct+'%;background:'+color+'"></div></div>'
+      +'<div class="progress-label">'+done+'/'+outcomes.length+' covered or mastered ('+pct+'%)</div>'
+      +'<div class="progress-breakdown">'
+      +'<div class="breakdown-item"><div class="breakdown-dot" style="background:#e0e0e0"></div>'+counts['Not Started']+' Not started</div>'
+      +'<div class="breakdown-item"><div class="breakdown-dot" style="background:#ffc107"></div>'+counts['Partially']+' Partially</div>'
+      +'<div class="breakdown-item"><div class="breakdown-dot" style="background:#4ecdc4"></div>'+counts['Covered']+' Covered</div>'
+      +'<div class="breakdown-item"><div class="breakdown-dot" style="background:#43e97b"></div>'+counts['Mastered']+' Mastered</div>'
+      +'</div></div>';
+  }).join('');
+}
+
+// ============================================================
+// GOOGLE SHEETS SYNC
+// ============================================================
+function saveSheetsUrl(){
+  var url=document.getElementById('sheetsUrlInput').value.trim();
+  state.sheetsUrl=url;saveState();
+  document.getElementById('syncBar').style.display=url?'flex':'none';
+  toast('\u2705 Sheets URL saved!');
+}
+function setSyncStatus(msg,type){
+  var el=document.getElementById('syncStatus');if(el){el.textContent=msg;el.className='sync-status'+(type?' '+type:'');}
+  var sel=document.getElementById('settingsSyncStatus');if(sel){sel.textContent=msg;sel.style.color=type==='error'?'#c5221f':type==='syncing'?'#1967d2':'#1a7a38';}
+}
+async function pushToSheets(){
+  if(!state.sheetsUrl){toast('\u26A0\uFE0F No Sheets URL — check Settings');return;}
+  setSyncStatus('Syncing\u2026','syncing');
+  var pushBtn=document.getElementById('pushBtn');if(pushBtn)pushBtn.disabled=true;
+  var outcomeRows=OUTCOMES.map(function(o){var od=state.outcomes[o.code]||{};return {subject:o.subject,code:o.code,outcome:o.desc,status:od.status||'Not Started',evidence:od.evidence||'',lastActivityTitle:od.lastActivityTitle||'',lastActivitySummary:od.lastActivitySummary||'',lastActivityWeek:od.lastActivityWeek||'',activitiesCount:od.activitiesCount||0,lastUpdated:od.lastUpdated||''};});
+  var historyRows=[];
+  Object.keys(state.activities).forEach(function(weekKey){
+    (state.activities[weekKey]||[]).forEach(function(act){
+      if(act.completed){historyRows.push({weekKey:weekKey,weekRange:act.lastActivityWeek||weekKey,day:act.day,subject:act.subject,outcomeCode:act.outcomeCode,activityTitle:act.title||'',activitySummary:act.activitySummary||act.outcomeLink||'',adhdStyle:act.adhdStyle||'',hyperfocus:act.hyperfocusConnection||''});}
+    });
+  });
+  var notesRows=Object.keys(state.weekNotes).map(function(wk){var n=state.weekNotes[wk];return {weekKey:wk,observations:n.observations||'',adhd:n.adhd||'',nextWeek:n.nextWeek||'',wins:n.wins||''};});
+  try{
+    var res=await fetch(state.sheetsUrl,{method:'POST',body:JSON.stringify({action:'push',outcomes:outcomeRows,history:historyRows,notes:notesRows})});
+    var json=await res.json();
+    if(json.status==='ok'){
+      var now=new Date().toLocaleString('en-AU');state.lastSynced=now;saveState();
+      setSyncStatus('Last synced: '+now);
+      var slt=document.getElementById('syncLastTime');if(slt)slt.textContent='Last pushed: '+now;
+      toast('\uD83D\uDCCA Synced to Google Sheets!');
+    }else{setSyncStatus('Error: '+(json.message||'Unknown'),'error');toast('\u274C Sync failed');}
+  }catch(e){setSyncStatus('Error: '+e.message,'error');toast('\u274C Could not reach Google Sheets');}
+  if(pushBtn)pushBtn.disabled=false;
+}
+async function pullFromSheets(){
+  if(!state.sheetsUrl){toast('\u26A0\uFE0F No Sheets URL — check Settings');return;}
+  setSyncStatus('Loading\u2026','syncing');
+  var pullBtn=document.getElementById('pullBtn');if(pullBtn)pullBtn.disabled=true;
+  try{
+    var res=await fetch(state.sheetsUrl+'?action=pull');
+    var json=await res.json();
+    if(json.status==='ok'&&json.outcomes){
+      json.outcomes.forEach(function(row){if(state.outcomes[row.code]){state.outcomes[row.code]=Object.assign({},state.outcomes[row.code],{status:row.status||'Not Started',evidence:row.evidence||'',lastActivityTitle:row.lastActivityTitle||'',lastActivitySummary:row.lastActivitySummary||'',lastActivityWeek:row.lastActivityWeek||'',activitiesCount:parseInt(row.activitiesCount)||0,lastUpdated:row.lastUpdated||''});}});
+      saveState();
+      var now=new Date().toLocaleString('en-AU');setSyncStatus('Pulled: '+now);
+      var slt=document.getElementById('syncLastTime');if(slt)slt.textContent='Last pulled: '+now;
+      toast('\u2705 Data restored from Google Sheets!');
+      if(document.getElementById('page-outcomes').classList.contains('active'))renderOutcomes();
+      if(document.getElementById('page-progress').classList.contains('active'))renderProgress();
+    }else{setSyncStatus('Error: '+(json.message||'No data'),'error');toast('\u274C Pull failed');}
+  }catch(e){setSyncStatus('Error: '+e.message,'error');toast('\u274C Could not reach Google Sheets');}
+  if(pullBtn)pullBtn.disabled=false;
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function saveApiKey(){
+  var k=document.getElementById('apiKeyInput').value.trim();if(!k){toast('\u26A0\uFE0F Enter a key');return;}
+  state.apiKey=k;saveState();
+  document.getElementById('apiStatus').className='api-status ok';document.getElementById('apiStatus').textContent='\u2705 Saved!';
+  document.getElementById('api-banner').style.display='none';toast('\uD83D\uDD11 API key saved!');
+}
+function saveApiKeySettings(){
+  var k=document.getElementById('apiKeySettings').value.trim();if(!k){toast('\u26A0\uFE0F Enter a key');return;}
+  state.apiKey=k;saveState();toast('\uD83D\uDD11 API key saved!');
+}
+function exportData(){
+  var blob=new Blob([JSON.stringify({outcomes:state.outcomes,activities:state.activities,weekNotes:state.weekNotes},null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='jack_homeschool_'+new Date().toISOString().split('T')[0]+'.json';a.click();toast('\uD83D\uDCE5 Exported!');
+}
+function importData(event){
+  var file=event.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var imported=JSON.parse(e.target.result);
+      if(imported.outcomes)Object.assign(state.outcomes,imported.outcomes);
+      if(imported.activities)Object.assign(state.activities,imported.activities);
+      if(imported.weekNotes)Object.assign(state.weekNotes,imported.weekNotes);
+      saveState();renderWeekGrid();renderStoredActivities();loadNotes();toast('\u2705 Data imported!');
+    }catch(err){toast('\u274C Invalid file');}
+  };
+  reader.readAsText(file);
+}
+function clearAllData(){
+  if(!confirm('Clear all data? This cannot be undone.'))return;
+  state.outcomes={};state.activities={};state.weekNotes={};state.carryOvers={};
+  OUTCOMES.forEach(function(o){state.outcomes[o.code]={status:'Not Started',evidence:'',lastUpdated:'',lastActivityTitle:'',lastActivitySummary:'',lastActivityWeek:'',activitiesCount:0};});
+  saveState();renderWeekGrid();renderStoredActivities();loadNotes();toast('\uD83D\uDDD1 Data cleared');
+}
+
+/// ============================================================
+// FIELD MODE
+// ============================================================
+var fieldState={acts:[],idx:0,globalIdxs:[]};
+
+function enterFieldMode(){
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  var allActs=state.activities[weekKey]||[];
+  var days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  var todayJs=new Date().getDay();
+  var todayName=(todayJs>=1&&todayJs<=5)?days[todayJs-1]:days[0];
+  var todayActs=allActs.filter(function(a){return a.day===todayName;});
+  var incomplete=todayActs.filter(function(a){return !a.completed;});
+  var acts=incomplete.length>0?incomplete:todayActs;
+  if(acts.length===0){acts=allActs.filter(function(a){return !a.completed;});}
+  if(acts.length===0){toast('No activities to show - generate some first!');return;}
+  fieldState.acts=acts;
+  fieldState.idx=0;
+  fieldState.globalIdxs=acts.map(function(a){return allActs.indexOf(a);});
+  document.getElementById('fieldOverlay').classList.add('active');
+  document.body.style.overflow='hidden';
+  renderFieldActivity();
+}
+
+function exitFieldMode(){
+  document.getElementById('fieldOverlay').classList.remove('active');
+  document.body.style.overflow='';
+  renderStoredActivities();
+  renderWeekGrid();
+}
+
+function renderFieldActivity(){
+  var acts=fieldState.acts;
+  var idx=fieldState.idx;
+  var act=acts[idx];
+  var total=acts.length;
+  document.getElementById('fieldProgressFill').style.width=Math.round((idx/total)*100)+'%';
+  document.getElementById('fieldCounter').textContent=(idx+1)+' of '+total;
+  document.getElementById('fieldDayTitle').textContent=act.day+' - Field Mode';
+  document.getElementById('fieldSubTitle').textContent=act.subject+' - '+(act.duration||'45 min');
+  var prevBtn=document.getElementById('fieldPrevBtn');
+  prevBtn.style.opacity=idx===0?'0.3':'1';
+  prevBtn.disabled=idx===0;
+  document.getElementById('fieldNextBtn').textContent=idx===total-1?'Done':'Next';
+
+  var pillHtml='<span class="field-subject-badge '+(SCOL[act.subject]||'sub-maths')+'">'+act.subject+'</span>';
+
+  var explHtml='';
+  if(act.conceptExplainer){
+    var ce=act.conceptExplainer;
+    explHtml='<div class="field-explainer">'
+      +'<div class="fe-title">How it works: '+(ce.heading||'')+'</div>'
+      +'<p>'+(ce.explanation||'')+'</p>'
+      +(ce.example?'<div class="fe-example">Example: '+(ce.example||'')+'</div>':'')
+      +'</div>';
+  }
+
+  var stepsHtml='<div class="field-steps">'
+    +(act.steps||[]).map(function(s,i){
+      var t=s.text||s; var tm=s.time||'';
+      return '<div class="field-step">'
+        +'<div class="field-step-num">'+(i+1)+'</div>'
+        +'<div><div class="field-step-text">'+t+'</div>'
+        +(tm?'<div class="field-step-time">'+tm+'</div>':'')
+        +'</div></div>';
+    }).join('')+'</div>';
+
+  var bbHtml=act.brainBreak?'<div class="field-brain-break"><strong>Brain break:</strong> '+act.brainBreak+'</div>':'';
+
+  var qHtml='';
+  if(act.practiceQuestions&&act.practiceQuestions.length){
+    qHtml='<div class="field-questions">'
+      +'<div style="font-size:14px;font-weight:800;color:#a8e6a8;margin-bottom:10px">Practice Questions</div>'
+      +act.practiceQuestions.map(function(q,qi){
+        var ans=(q.answer||'').replace(/'/g,'&#39;');
+        var hint=(q.hint||'').replace(/'/g,'&#39;');
+        return '<div class="field-q">'
+          +'<p>'+(qi+1)+'. '+(q.question||'')+'</p>'
+          +'<input class="field-q-input" type="text" placeholder="Type your answer..." id="fq-'+qi+'">'
+          +'<button class="field-q-check" onclick="checkFieldAnswer('+qi+',\''+ans+'\',\''+hint+'\')">Check Answer</button>'
+          +'<div class="field-q-fb" id="fq-fb-'+qi+'"></div>'
+          +'</div>';
+      }).join('')+'</div>';
+  }
+
+  var completed=act.completed;
+  var completeHtml='<button class="field-complete-btn'+(completed?' done':'')+'" id="fieldCompleteBtn" onclick="fieldMarkComplete()">'
+    +(completed?'Completed!':'Mark as Complete')+'</button>';
+
+  var hfHtml=act.hyperfocusConnection?'<div style="background:#1a3a2a;border:2px solid #3a5c3a;border-radius:10px;padding:10px 12px;margin-bottom:14px;color:#a8e6a8;font-size:14px"><strong>Interest connection:</strong> '+act.hyperfocusConnection+'</div>':'';
+
+  var skipHtml=(!completed)?'<button onclick="fieldSkip()" style="width:100%;margin-top:8px;padding:12px;background:transparent;border:2px solid #3a5c3a;color:#8ab88a;border-radius:10px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:14px;cursor:pointer">Carry Over</button>':'';
+
+  document.getElementById('fieldContent').innerHTML=
+    pillHtml
+    +'<div class="field-title">'+(act.title||'Activity')+'</div>'
+    +'<div class="field-meta">'+(act.outcomeLink||'')+'</div>'
+    +hfHtml+explHtml+stepsHtml+bbHtml+qHtml+completeHtml+skipHtml
+    +'<div style="height:24px"></div>';
+  document.getElementById('fieldContent').scrollTop=0;
+}
+
+function fieldNav(dir){
+  var newIdx=fieldState.idx+dir;
+  if(newIdx<0)return;
+  if(newIdx>=fieldState.acts.length){exitFieldMode();return;}
+  fieldState.idx=newIdx;
+  renderFieldActivity();
+}
+
+function checkFieldAnswer(qi,correctAnswer,hint){
+  var input=document.getElementById('fq-'+qi);
+  var fb=document.getElementById('fq-fb-'+qi);
+  if(!input||!fb)return;
+  var val=input.value.trim().toLowerCase().replace(/\s/g,'');
+  var correct=correctAnswer.trim().toLowerCase().replace(/\s/g,'');
+  if(val===correct||val===correct.replace(/[^0-9.,-]/g,'')){
+    fb.className='field-q-fb correct';fb.textContent='Correct! Brilliant work Jack!';
+  }else{
+    fb.className='field-q-fb wrong';fb.textContent='Not quite - '+hint+' (Answer: '+correctAnswer+')';
+  }
+}
+
+function fieldMarkComplete(){
+  var globalIdx=fieldState.globalIdxs[fieldState.idx];
+  markComplete(globalIdx);
+  fieldState.acts[fieldState.idx].completed=true;
+  var btn=document.getElementById('fieldCompleteBtn');
+  if(btn){btn.className='field-complete-btn done';btn.textContent='Completed!';}
+  document.getElementById('fieldProgressFill').style.width=
+    Math.round(((fieldState.idx+1)/fieldState.acts.length)*100)+'%';
+}
+
+function fieldSkip(){
+  var globalIdx=fieldState.globalIdxs[fieldState.idx];
+  skipActivity(globalIdx);
+  fieldNav(1);
+}
+
+// ============================================================
+// PRINT MODAL
+// ============================================================
+function printActivities(){
+  // Build the activity checkboxes from this week's activities
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  var acts=state.activities[weekKey]||[];
+  var checksEl=document.getElementById('printActivityChecks');
+  if(!checksEl)return;
+  checksEl.innerHTML='';
+  if(acts.length===0){
+    checksEl.innerHTML='<div style="font-size:13px;color:var(--muted);padding:8px 10px">No activities generated for this week yet.</div>';
+  } else {
+    // Group by day
+    var days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+    days.forEach(function(day){
+      var dayActs=acts.filter(function(a){return a.day===day;});
+      if(!dayActs.length)return;
+      var dayLabel=document.createElement('div');
+      dayLabel.style.cssText='font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:6px 10px 2px;';
+      dayLabel.textContent=day;
+      checksEl.appendChild(dayLabel);
+      dayActs.forEach(function(act,i){
+        var globalIdx=acts.indexOf(act);
+        var pillClass=SCOL[act.subject]||'sub-maths';
+        var row=document.createElement('div');
+        row.className='print-check-row';
+        var doneLabel=act.completed?' ✅':'';
+        row.innerHTML='<input type="checkbox" id="pact-'+globalIdx+'" data-idx="'+globalIdx+'" checked>'
+          +'<label for="pact-'+globalIdx+'">'
+          +'<span class="pill '+pillClass+'">'+act.subject+'</span> '
+          +(act.title||'Activity')+doneLabel
+          +'</label>';
+        checksEl.appendChild(row);
+      });
+    });
+  }
+  document.getElementById('printModal').style.display='flex';
+}
+
+function selectAllActivities(){
+  document.querySelectorAll('#printActivityChecks input[type=checkbox]').forEach(function(cb){cb.checked=true;});
+}
+
+function closePrintModal(){
+  document.getElementById('printModal').style.display='none';
+}
+
+function executePrint(){
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  var acts=state.activities[weekKey]||[];
+  // Work out which activity indices are selected
+  var selectedIdxs=[];
+  document.querySelectorAll('#printActivityChecks input[type=checkbox]:checked').forEach(function(cb){
+    selectedIdxs.push(parseInt(cb.getAttribute('data-idx')));
+  });
+  var includeNotes=document.getElementById('printNotes').checked;
+
+  // Set the banner
+  var banner=document.getElementById('printWeekBanner');
+  if(banner)banner.textContent="Jack's Homeschool - "+formatWeekRange(state.currentWeekOffset);
+
+  // Show/hide individual activity cards based on selection
+  var cards=document.querySelectorAll('#activitiesList .activity-card');
+  var prevDisplay=[];
+  cards.forEach(function(card,i){
+    prevDisplay.push(card.style.display);
+    card.style.display=selectedIdxs.indexOf(i)>=0?'block':'none';
+  });
+
+  // Show/hide notes section
+  var notesEl=document.querySelector('.notes-section');
+  var prevNotesDisplay=notesEl?notesEl.style.display:'';
+  if(notesEl)notesEl.style.display=includeNotes?'block':'none';
+
+  // Expand all visible activity bodies
+  cards.forEach(function(card,i){
+    if(selectedIdxs.indexOf(i)>=0){
+      var body=card.querySelector('.activity-body');
+      var icon=card.querySelector('.expand-icon');
+      if(body)body.classList.add('open');
+      if(icon)icon.classList.add('open');
+    }
+  });
+
+  // Make sure activities section is visible
+  var actsSection=document.getElementById('activitiesSection');
+  var prevActsDisplay=actsSection?actsSection.style.display:'';
+  if(actsSection&&selectedIdxs.length>0)actsSection.style.display='block';
+
+  closePrintModal();
+  setTimeout(function(){
+    window.print();
+    // Restore everything after print dialog
+    setTimeout(function(){
+      cards.forEach(function(card,i){card.style.display=prevDisplay[i];});
+      if(notesEl)notesEl.style.display=prevNotesDisplay;
+      if(actsSection)actsSection.style.display=prevActsDisplay;
+      // Collapse bodies again
+      cards.forEach(function(card,i){
+        if(selectedIdxs.indexOf(i)>=0){
+          var body=card.querySelector('.activity-body');
+          var icon=card.querySelector('.expand-icon');
+          if(body)body.classList.remove('open');
+          if(icon)icon.classList.remove('open');
+        }
+      });
+    },1500);
+  },100);
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg){var el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(function(){el.remove();},3100);}
+
+// ============================================================
+// INIT
+// ============================================================
+loadState();
+renderWeekGrid();
+renderStoredActivities();
+loadNotes();
+if(state.apiKey){document.getElementById('api-banner').style.display='none';document.getElementById('apiKeySettings').value=state.apiKey;}
+if(state.hyperfocus)document.getElementById('hyperfocusInput').value=state.hyperfocus;
+if(state.sheetsUrl){document.getElementById('syncBar').style.display='flex';document.getElementById('sheetsUrlInput').value=state.sheetsUrl;if(state.lastSynced){var slt=document.getElementById('syncLastTime');if(slt)slt.textContent='Last synced: '+state.lastSynced;}}
+// Restore toggle states
+(function(){
+  var energyBtns=document.querySelectorAll('#energyRow .tog-btn');
+  energyBtns.forEach(function(b){b.classList.remove('active');if(b.textContent.toLowerCase().indexOf(state.energy)>=0)b.classList.add('active');});
+  var locBtns=document.querySelectorAll('#locationRow .tog-btn');
+  locBtns.forEach(function(b){b.classList.remove('active');if(b.textContent.toLowerCase().indexOf(state.location||'either')>=0)b.classList.add('active');});
+})();
+</script>
+</body>
+</html>
