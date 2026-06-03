@@ -253,6 +253,25 @@ main{max-width:1100px;margin:0 auto;padding:24px 20px;}
 .field-complete-btn{width:100%;padding:16px;border-radius:12px;border:2px solid #43e97b;background:transparent;color:#43e97b;font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;cursor:pointer;margin-top:4px;}
 .field-complete-btn.done{background:#43e97b;color:#1a2a1a;}
 .field-counter{color:#8ab88a;font-size:13px;font-weight:700;white-space:nowrap;padding:0 4px;}
+.schedule-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease;}
+.schedule-modal{background:white;border-radius:var(--radius);padding:24px;max-width:520px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,0.3);max-height:85vh;overflow-y:auto;}
+.schedule-modal h3{font-family:'Fredoka One',cursive;font-size:22px;margin-bottom:4px;}
+.schedule-modal .sub-note{font-size:13px;color:var(--muted);margin-bottom:18px;}
+.schedule-day-row{margin-bottom:16px;}
+.schedule-day-row .day-label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:7px;display:flex;align-items:center;justify-content:space-between;}
+.schedule-day-row .day-label button{font-size:11px;font-weight:700;color:var(--accent1);background:none;border:none;cursor:pointer;font-family:'Nunito',sans-serif;}
+.subject-chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.subject-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:800;color:white;cursor:pointer;transition:all .2s;}
+.subject-chip .chip-remove{background:rgba(0,0,0,0.2);border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.subject-chip .chip-remove:hover{background:rgba(0,0,0,0.4);}
+.add-subject-wrap{display:flex;gap:6px;align-items:center;margin-top:8px;}
+.add-subject-select{padding:6px 10px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+.add-subject-btn{padding:6px 14px;background:var(--accent2);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;}
+.schedule-modal-btns{display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:2px solid var(--border);}
+.schedule-save-btn{flex:1;padding:11px;background:var(--accent1);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer;}
+.schedule-reset-btn{padding:11px 18px;background:white;color:var(--muted);border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;}
+.edit-schedule-btn{padding:5px 12px;background:white;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.edit-schedule-btn:hover{border-color:var(--accent1);color:var(--accent1);}
 @media print{
   header,nav,.config-bar,.week-nav,.gen-all-btn,.api-banner,.complete-btn,.skip-btn,
   .ia-check,.sync-bar,.nav-btn,.day-gen-btn,.manual-log-section,
@@ -315,6 +334,10 @@ main{max-width:1100px;margin:0 auto;padding:24px 20px;}
       <label>🎯 Jack's Current Hyperfocus (optional)</label>
       <input class="config-input" id="hyperfocusInput" type="text" placeholder="e.g. fishing, Pokémon, martial arts…" oninput="state.hyperfocus=this.value;saveState()">
     </div>
+    <div class="config-field" style="flex:2;min-width:200px;">
+      <label>🌍 Real World Context (optional)</label>
+      <input class="config-input" id="realWorldInput" type="text" placeholder="e.g. at the beach, fishing trip, cooking dinner, bushwalk…" oninput="state.realWorldContext=this.value;saveState()">
+    </div>
     <div class="config-field">
       <label>⚡ Energy Level</label>
       <div class="toggle-row" id="energyRow">
@@ -331,6 +354,14 @@ main{max-width:1100px;margin:0 auto;padding:24px 20px;}
         <button class="tog-btn" onclick="setToggle('location','outdoors',this)">🌿 Outdoors</button>
       </div>
     </div>
+    <div class="config-field">
+      <label>⏱ Lesson Length</label>
+      <div class="toggle-row" id="lessonRow">
+        <button class="tog-btn" onclick="setToggle('lesson','quick',this)" title="15 min — one concept, 2-3 steps. Best for high energy days or outdoors.">&#9889; Quick 15m</button>
+        <button class="tog-btn active" onclick="setToggle('lesson','standard',this)" title="30 min — full activity with practice questions. Normal days.">&#128197; Standard 30m</button>
+        <button class="tog-btn" onclick="setToggle('lesson','deep',this)" title="45 min — deep dive with extension challenge. Hyperfocus days.">&#127775; Deep 45m</button>
+      </div>
+    </div>
   </div>
 
   <div class="week-header">
@@ -342,6 +373,7 @@ main{max-width:1100px;margin:0 auto;padding:24px 20px;}
     <div class="week-nav">
       <button class="week-arrow" onclick="changeWeek(-1)">←</button>
       <button class="week-arrow" onclick="changeWeek(1)">→</button>
+      <button class="edit-schedule-btn" onclick="openScheduleEditor()">&#9998; Edit Schedule</button>
       <button class="gen-all-btn" onclick="generateAllDays()" id="generateBtn">✨ Generate All Days</button>
     </div>
   </div>
@@ -436,6 +468,19 @@ main{max-width:1100px;margin:0 auto;padding:24px 20px;}
 </div>
 
 </main>
+
+<!-- SCHEDULE EDITOR MODAL -->
+<div class="schedule-modal-overlay" id="scheduleModal" style="display:none" onclick="if(event.target===this)closeScheduleEditor()">
+  <div class="schedule-modal">
+    <h3>&#9998; Edit This Week's Schedule</h3>
+    <p class="sub-note">Changes apply to this week only. Default schedule is restored next week. Drag subjects between days to swap them.</p>
+    <div id="scheduleEditorBody"></div>
+    <div class="schedule-modal-btns">
+      <button class="schedule-reset-btn" onclick="resetWeekSchedule()">&#8635; Reset to Default</button>
+      <button class="schedule-save-btn" onclick="saveScheduleEditor()">&#10003; Save & Close</button>
+    </div>
+  </div>
+</div>
 
 <!-- FIELD MODE OVERLAY -->
 <div class="field-overlay" id="fieldOverlay">
@@ -565,7 +610,7 @@ const STATUS_OPTIONS=['Not Started','Partially','Covered','Mastered'];
 // ============================================================
 // STATE
 // ============================================================
-var state={apiKey:'',sheetsUrl:'',outcomes:{},activities:{},currentWeekOffset:0,hyperfocus:'',energy:'mixed',location:'either',weekNotes:{},lastSynced:'',carryOvers:{}};
+var state={apiKey:'',sheetsUrl:'',outcomes:{},activities:{},currentWeekOffset:0,hyperfocus:'',energy:'mixed',location:'either',lesson:'standard',realWorldContext:'',dayOverrides:{},weekNotes:{},lastSynced:'',carryOvers:{}};
 
 function loadState(){
   try{var s=localStorage.getItem('jackHS4');if(s){var p=JSON.parse(s);Object.assign(state,p);}}catch(e){}
@@ -638,6 +683,7 @@ function showPage(id,btn){
 function setToggle(type,val,btn){
   if(type==='energy'){state.energy=val;document.querySelectorAll('#energyRow .tog-btn').forEach(function(b){b.classList.remove('active');});}
   if(type==='location'){state.location=val;document.querySelectorAll('#locationRow .tog-btn').forEach(function(b){b.classList.remove('active');});}
+  if(type==='lesson'){state.lesson=val;document.querySelectorAll('#lessonRow .tog-btn').forEach(function(b){b.classList.remove('active');});}
   btn.classList.add('active');
   saveState();
 }
@@ -657,7 +703,7 @@ function renderWeekGrid(){
   var days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
   var abbrs=['Mon','Tue','Wed','Thu','Fri'];
   days.forEach(function(day,i){
-    var subjects=SCHEDULE[day]||[];
+    var weekSched=getWeekSchedule();var subjects=weekSched[day]||[];
     var dayActs=existingActs.filter(function(a){return a.day===day;});
     var allDone=dayActs.length>0&&dayActs.every(function(a){return a.completed;});
     var past=isDayPast(day);
@@ -710,7 +756,7 @@ async function generateDay(day,silent){
   var weekKey=getWeekKey(state.currentWeekOffset);
   if(!state.activities[weekKey])state.activities[weekKey]=[];
   var preserved=state.activities[weekKey].filter(function(a){return a.day!==day||a.completed;});
-  var subjects=SCHEDULE[day]||[];
+  var subjects=(getWeekSchedule()[day])||SCHEDULE[day]||[];
   var newActs=[];
   document.getElementById('activitiesSection').style.display='block';
   for(var si=0;si<subjects.length;si++){
@@ -740,6 +786,32 @@ async function generateDay(day,silent){
 async function callGenerateAPI(day,subject,outcome,carryOver){
   var energyMap={mixed:'could be high-energy/physical OR calm desk-based',high:'should be active and physical, movement-based where possible',low:'should be calm, desk-based or creative'};
   var locationMap={either:'can be indoors or outdoors',indoors:'MUST be indoors',outdoors:'should be outdoors where possible'};
+  var lessonMap={
+    quick:{
+      label:'QUICK SESSION (15 minutes)',
+      instructions:'This is a SHORT 15-minute activity. Keep it tight and focused. Include ONLY: one core concept explainer (2-3 sentences max with one example), 2-3 steps (3-4 min each), and 2 practice questions. NO brain break needed. NO extension. End with one clear win Jack can feel good about. This suits high energy days or outdoor sessions.',
+      duration:'15 min',
+      maxSteps:3,
+      maxQuestions:2
+    },
+    standard:{
+      label:'STANDARD SESSION (30 minutes)',
+      instructions:'This is a STANDARD 30-minute activity. Include: a concept explainer with worked example, 4-5 steps, a brain break suggestion at the halfway point, and 3 practice questions. Balance learning with engagement. This is the normal everyday format.',
+      duration:'30 min',
+      maxSteps:5,
+      maxQuestions:3
+    },
+    deep:{
+      label:'DEEP DIVE SESSION (45 minutes)',
+      instructions:'This is a DEEP DIVE 45-minute session for when Jack is in hyperfocus mode and ready to go deep. Include: a thorough concept explainer with multiple examples, 5-6 steps, a brain break in the middle, 4-5 practice questions, AND an extension challenge at the end (a harder question or creative application that takes the learning further). Make it rich and rewarding.',
+      duration:'45 min',
+      maxSteps:6,
+      maxQuestions:5
+    }
+  };
+  var lesson=state.lesson||'standard';
+  var lessonConfig=lessonMap[lesson];
+  var realWorldLine=state.realWorldContext?"\nREAL WORLD CONTEXT: Today Jack is "+state.realWorldContext+". Shape ALL activities around this setting — maths should use real measurements, observations or problems from this context; science should use what's there; English could document the experience etc. Make it feel genuinely connected to what they're doing today.":'';
   var hyperfocusLine=state.hyperfocus?"\nJack's current passion/hyperfocus: \""+state.hyperfocus+"\". Weave this in naturally where you can — ADHD kids learn best when connected to what they love.":'';
   var carryLine=carryOver?"\nNOTE: Jack previously skipped an activity on this outcome: \""+carryOver.title+"\". Create a FRESH approach to the same outcome — completely different from the skipped one.":'';
   var subjectNotes={
@@ -751,7 +823,7 @@ async function callGenerateAPI(day,subject,outcome,carryOver){
     'Aquatic Technology':'Connect to real fishing, snorkelling or marine activities. Include a Marine Fact about the concept.'
   };
   var subjectNote=subjectNotes[subject]||'';
-  var prompt="You are a specialist homeschool teacher who understands ADHD learners well. Design an activity for Jack, Stage 4 student in NSW Australia who has ADHD.\n\nADHD rules — always apply:\n- 4-6 short steps with time estimates\n- Start with the most engaging part first\n- Include a brain break suggestion for halfway\n- Use simple language and worked examples, not walls of text\n- End with something Jack can feel proud of\n- Warm encouraging tone throughout\n\nMATERIALS RULE: Jack lives 30 minutes from town in the bush. ALL materials must be common household items (paper, pens, water, food, sticks, rocks etc). NO specialty items or anything needing a shop.\n"+hyperfocusLine+carryLine+"\n\nEnergy: "+state.energy+" — activity "+energyMap[state.energy]+"\nLocation: "+state.location+" — activity "+locationMap[state.location]+"\nSubject: "+subject+" | Day: "+day+"\nOutcome: "+outcome.code+" — "+outcome.desc+"\nCurrent status: "+((state.outcomes[outcome.code]&&state.outcomes[outcome.code].status)||'Not Started')+"\n\n"+subjectNote+"\n\nReply ONLY with a JSON object, no markdown, no backticks:\n{\"title\":\"short catchy title\",\"adhdStyle\":\"movement or desk or creative or outdoor\",\"duration\":\"e.g. 45 min\",\"brainBreak\":\"2 min movement break idea\",\"conceptExplainer\":{\"heading\":\"What is X?\",\"explanation\":\"plain English 2-3 sentences\",\"example\":\"worked example\"},\"materials\":[\"household item\"],\"steps\":[{\"text\":\"what to do\",\"time\":\"X min\"}],\"practiceQuestions\":[{\"question\":\"Q\",\"answer\":\"A\",\"hint\":\"hint\"}],\"activitySummary\":\"past tense 1-2 sentence summary for records\",\"outcomeLink\":\"one sentence connecting to outcome\",\"hyperfocusConnection\":\"connection to interest or empty string\",\"encouragement\":\"short upbeat line for Jack\"}";
+  var prompt="You are a specialist homeschool teacher who understands ADHD learners well. Design an activity for Jack, Stage 4 student in NSW Australia who has ADHD.\n\nADHD rules — always apply:\n- 4-6 short steps with time estimates\n- Start with the most engaging part first\n- Include a brain break suggestion for halfway\n- Use simple language and worked examples, not walls of text\n- End with something Jack can feel proud of\n- Warm encouraging tone throughout\n\nMATERIALS RULE: Jack lives 30 minutes from town in the bush. ALL materials must be common household items (paper, pens, water, food, sticks, rocks etc). NO specialty items or anything needing a shop.\n"+hyperfocusLine+realWorldLine+carryLine+"\n\nEnergy: "+state.energy+" — activity "+energyMap[state.energy]+"\nLocation: "+state.location+" — activity "+locationMap[state.location]+"\\nLesson: "+lessonConfig.label+"\\n"+lessonConfig.instructions+"\\nSubject: "+subject+" | Day: "+day+"\nOutcome: "+outcome.code+" — "+outcome.desc+"\nCurrent status: "+((state.outcomes[outcome.code]&&state.outcomes[outcome.code].status)||'Not Started')+"\n\n"+subjectNote+"\n\nReply ONLY with a JSON object, no markdown, no backticks:\n{\"title\":\"short catchy title\",\"adhdStyle\":\"movement or desk or creative or outdoor\",\"duration\":\"e.g. 45 min\",\"brainBreak\":\"2 min movement break idea\",\"conceptExplainer\":{\"heading\":\"What is X?\",\"explanation\":\"plain English 2-3 sentences\",\"example\":\"worked example\"},\"materials\":[\"household item\"],\"steps\":[{\"text\":\"what to do\",\"time\":\"X min\"}],\"practiceQuestions\":[{\"question\":\"Q\",\"answer\":\"A\",\"hint\":\"hint\"}],\"activitySummary\":\"past tense 1-2 sentence summary for records\",\"outcomeLink\":\"one sentence connecting to outcome\",\"hyperfocusConnection\":\"connection to interest or empty string\",\"encouragement\":\"short upbeat line for Jack\"}";
 
   var response=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
@@ -1169,6 +1241,136 @@ function clearAllData(){
 }
 
 /// ============================================================
+// SCHEDULE EDITOR
+// ============================================================
+var ALL_SUBJECTS=['Maths','English','Science','Geography','PDHPE','Aquatic Technology'];
+
+function getWeekSchedule(){
+  // Get schedule for current week - use override if set, else default
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  var overrides=state.dayOverrides[weekKey]||{};
+  var result={};
+  var days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  days.forEach(function(day){
+    result[day]=overrides[day]?overrides[day].slice():SCHEDULE[day].slice();
+  });
+  return result;
+}
+
+function openScheduleEditor(){
+  var weekSchedule=getWeekSchedule();
+  var body=document.getElementById('scheduleEditorBody');
+  body.innerHTML='';
+  var days=['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  days.forEach(function(day){
+    var subjects=weekSchedule[day];
+    var row=document.createElement('div');
+    row.className='schedule-day-row';
+    row.setAttribute('data-day',day);
+    var isOverridden=state.dayOverrides[getWeekKey(state.currentWeekOffset)]&&state.dayOverrides[getWeekKey(state.currentWeekOffset)][day];
+    row.innerHTML='<div class="day-label"><span>'+day+(isOverridden?' <span style="color:var(--accent1);font-size:10px">(modified)</span>':'')+'</span></div>'
+      +'<div class="subject-chips" id="chips-'+day+'"></div>'
+      +'<div class="add-subject-wrap">'
+      +'<select class="add-subject-select" id="select-'+day+'">'
+      +ALL_SUBJECTS.map(function(s){return '<option>'+s+'</option>';}).join('')
+      +'</select>'
+      +'<button class="add-subject-btn" onclick="addSubjectToDay(\''+day+'\')">+ Add</button>'
+      +'</div>';
+    body.appendChild(row);
+    renderDayChips(day,subjects);
+  });
+  document.getElementById('scheduleModal').style.display='flex';
+}
+
+function renderDayChips(day,subjects){
+  var el=document.getElementById('chips-'+day);
+  if(!el)return;
+  el.innerHTML=subjects.map(function(s,i){
+    var cls=SCOL[s]||'sub-maths';
+    return '<span class="subject-chip '+cls+'" draggable="true" '
+      +'ondragstart="dragStart(event,\''+day+'\','+i+')" '
+      +'ondragover="event.preventDefault()" '
+      +'ondrop="dragDrop(event,\''+day+'\','+i+')">'
+      +s
+      +'<span class="chip-remove" onclick="removeSubjectFromDay(\''+day+'\','+i+')">&#10005;</span>'
+      +'</span>';
+  }).join('');
+}
+
+var dragSrc={day:null,idx:null};
+function dragStart(e,day,idx){dragSrc.day=day;dragSrc.idx=idx;}
+function dragDrop(e,targetDay,targetIdx){
+  e.preventDefault();
+  if(dragSrc.day===null)return;
+  var weekSchedule=getWeekSchedule();
+  var srcSubjects=weekSchedule[dragSrc.day];
+  var tgtSubjects=weekSchedule[targetDay];
+  var moved=srcSubjects.splice(dragSrc.idx,1)[0];
+  if(dragSrc.day===targetDay){
+    srcSubjects.splice(targetIdx,0,moved);
+  } else {
+    tgtSubjects.splice(targetIdx,0,moved);
+  }
+  // Re-render both days
+  renderDayChips(dragSrc.day,weekSchedule[dragSrc.day]);
+  renderDayChips(targetDay,weekSchedule[targetDay]);
+  // Store temp in a hidden data structure on the modal
+  document.getElementById('scheduleModal').dataset.tempSchedule=JSON.stringify(weekSchedule);
+  dragSrc={day:null,idx:null};
+}
+
+function addSubjectToDay(day){
+  var select=document.getElementById('select-'+day);
+  var subject=select.value;
+  var modal=document.getElementById('scheduleModal');
+  var weekSchedule=modal.dataset.tempSchedule?JSON.parse(modal.dataset.tempSchedule):getWeekSchedule();
+  if(!weekSchedule[day])weekSchedule[day]=[];
+  weekSchedule[day].push(subject);
+  modal.dataset.tempSchedule=JSON.stringify(weekSchedule);
+  renderDayChips(day,weekSchedule[day]);
+}
+
+function removeSubjectFromDay(day,idx){
+  var modal=document.getElementById('scheduleModal');
+  var weekSchedule=modal.dataset.tempSchedule?JSON.parse(modal.dataset.tempSchedule):getWeekSchedule();
+  weekSchedule[day].splice(idx,1);
+  modal.dataset.tempSchedule=JSON.stringify(weekSchedule);
+  renderDayChips(day,weekSchedule[day]);
+}
+
+function saveScheduleEditor(){
+  var modal=document.getElementById('scheduleModal');
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  if(modal.dataset.tempSchedule){
+    var weekSchedule=JSON.parse(modal.dataset.tempSchedule);
+    if(!state.dayOverrides)state.dayOverrides={};
+    state.dayOverrides[weekKey]=weekSchedule;
+    saveState();
+    toast('Schedule updated for this week!');
+  }
+  closeScheduleEditor();
+  renderWeekGrid();
+}
+
+function resetWeekSchedule(){
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  if(state.dayOverrides&&state.dayOverrides[weekKey]){
+    delete state.dayOverrides[weekKey];
+    saveState();
+  }
+  var modal=document.getElementById('scheduleModal');
+  delete modal.dataset.tempSchedule;
+  closeScheduleEditor();
+  renderWeekGrid();
+  toast('Schedule reset to default');
+}
+
+function closeScheduleEditor(){
+  document.getElementById('scheduleModal').style.display='none';
+}
+
+
+// ============================================================
 // FIELD MODE
 // ============================================================
 var fieldState={acts:[],idx:0,globalIdxs:[]};
@@ -1432,6 +1634,7 @@ renderStoredActivities();
 loadNotes();
 if(state.apiKey){document.getElementById('api-banner').style.display='none';document.getElementById('apiKeySettings').value=state.apiKey;}
 if(state.hyperfocus)document.getElementById('hyperfocusInput').value=state.hyperfocus;
+  if(state.realWorldContext)document.getElementById('realWorldInput').value=state.realWorldContext;
 if(state.sheetsUrl){document.getElementById('syncBar').style.display='flex';document.getElementById('sheetsUrlInput').value=state.sheetsUrl;if(state.lastSynced){var slt=document.getElementById('syncLastTime');if(slt)slt.textContent='Last synced: '+state.lastSynced;}}
 // Restore toggle states
 (function(){
@@ -1439,6 +1642,9 @@ if(state.sheetsUrl){document.getElementById('syncBar').style.display='flex';docu
   energyBtns.forEach(function(b){b.classList.remove('active');if(b.textContent.toLowerCase().indexOf(state.energy)>=0)b.classList.add('active');});
   var locBtns=document.querySelectorAll('#locationRow .tog-btn');
   locBtns.forEach(function(b){b.classList.remove('active');if(b.textContent.toLowerCase().indexOf(state.location||'either')>=0)b.classList.add('active');});
+  var lessonBtns=document.querySelectorAll('#lessonRow .tog-btn');
+  var lessonVal=state.lesson||'standard';
+  lessonBtns.forEach(function(b){b.classList.remove('active');if(b.getAttribute('onclick')&&b.getAttribute('onclick').indexOf("'"+lessonVal+"'")>=0)b.classList.add('active');});
 })();
 </script>
 </body>
