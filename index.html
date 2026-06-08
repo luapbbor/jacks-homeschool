@@ -323,7 +323,7 @@ main{max-width:1100px;margin:0 auto;padding:24px 20px;}
 
   <div class="sync-bar" id="syncBar" style="display:none">
     <div style="font-size:26px">📊</div>
-    <div class="sync-info"><h4>Google Sheets Sync</h4><p id="syncLastTime">Never synced</p></div>
+    <div class="sync-info"><h4>Google Sheets Sync</h4><p id="syncLastTime">Never synced</p><p style="font-size:11px;color:#e67e22;font-weight:700;margin-top:2px" id="syncDeviceNote"></p></div>
     <span class="sync-status" id="syncStatus">Ready</span>
     <button class="gs-btn gs-pull" id="pullBtn" onclick="pullFromSheets()">⬇ Pull from Sheets</button>
     <button class="gs-btn gs-push" id="pushBtn" onclick="pushToSheets()">⬆ Push to Sheets</button>
@@ -349,10 +349,11 @@ main{max-width:1100px;margin:0 auto;padding:24px 20px;}
     <div class="config-field">
       <label>🌤 Location</label>
       <div class="toggle-row" id="locationRow">
-        <button class="tog-btn active" onclick="setToggle('location','either',this)">🔀 Either</button>
-        <button class="tog-btn" onclick="setToggle('location','indoors',this)">🏠 Indoors</button>
-        <button class="tog-btn" onclick="setToggle('location','outdoors',this)">🌿 Outdoors</button>
+        <button class="tog-btn" data-locflag="indoors" onclick="toggleLocFlag('indoors',this)">🏠 Indoors</button>
+        <button class="tog-btn" data-locflag="outdoors" onclick="toggleLocFlag('outdoors',this)">🌿 Outdoors</button>
+        <button class="tog-btn" data-locflag="screen" onclick="toggleLocFlag('screen',this)">&#128241; Screen Only</button>
       </div>
+      <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:4px">Select any that apply — leave blank for no preference</div>
     </div>
     <div class="config-field">
       <label>⏱ Lesson Length</label>
@@ -599,7 +600,392 @@ const OUTCOMES=[
   {subject:'Aquatic Technology',code:'MAR4-12',desc:'Investigates opportunities to join volunteer marine-based service organisations'},
   {subject:'Aquatic Technology',code:'MAR4-13',desc:'Selects and presents results of appropriate research from varied sources'},
   {subject:'Aquatic Technology',code:'MAR4-14',desc:'Uses appropriate language, signs and conventions to communicate in marine contexts'},
-];
+]
+
+var SUBTOPICS={
+  'MA4-INT-C-01':[
+    'Compare and order integers — direction, magnitude, number line, < and > symbols',
+    'Add and subtract positive and negative integers',
+    'Multiply and divide positive and negative integers',
+    'Apply all 4 operations with order of operations and grouping symbols'
+  ],
+  'MA4-FRC-C-01':[
+    'Equivalent fractions, simplifying and comparing fractions',
+    'Add and subtract fractions (same and different denominators)',
+    'Multiply and divide fractions',
+    'Decimals — place value, ordering, operations',
+    'Percentages — convert between fractions, decimals and percentages, solve problems'
+  ],
+  'MA4-RAT-C-01':[
+    'Ratios — simplify ratios, divide quantities in a given ratio',
+    'Rates — identify and calculate rates (e.g. km/h, $/kg)',
+    'Distance-time graphs — interpret and analyse'
+  ],
+  'MA4-ALG-C-01':[
+    'Algebraic expressions — pronumerals, terms, coefficients, like terms',
+    'Simplify expressions — collect like terms',
+    'Expand expressions using the distributive law',
+    'Factorise expressions — find common factors'
+  ],
+  'MA4-IND-C-01':[
+    'Prime and composite numbers, prime factorisation',
+    'Square roots and cube roots',
+    'Index notation and index laws (multiplication and division)',
+    'Zero index and evaluating expressions with indices'
+  ],
+  'MA4-EQU-C-01':[
+    'Solve one-step equations (add, subtract, multiply, divide)',
+    'Solve two-step equations',
+    'Quadratic equations of the form ax² = c'
+  ],
+  'MA4-LIN-C-01':[
+    'Number patterns — identify, describe and continue sequences',
+    'Plot and graph linear relationships on a number plane',
+    'Interpret graphs and find solutions graphically'
+  ],
+  'MA4-LEN-C-01':[
+    'Perimeter of triangles, quadrilaterals and polygons',
+    'Circumference of circles — pi, diameter, radius',
+    'Solve perimeter and circumference problems in context'
+  ],
+  'MA4-PYT-C-01':[
+    'Identify right-angled triangles and label hypotenuse and shorter sides',
+    'Calculate the hypotenuse using Pythagoras theorem',
+    'Calculate a shorter side using Pythagoras theorem',
+    'Apply Pythagoras theorem to real-world problems'
+  ],
+  'MA4-ARE-C-01':[
+    'Area of triangles',
+    'Area of quadrilaterals — rectangles, parallelograms, trapeziums, rhombuses',
+    'Area of circles',
+    'Composite area — combining and subtracting shapes'
+  ],
+  'MA4-VOL-C-01':[
+    'Volume of rectangular prisms (length × width × height)',
+    'Volume of other right prisms — triangular, trapezoidal',
+    'Volume of cylinders',
+    'Capacity and unit conversion — mL, L, cm³, m³'
+  ],
+  'MA4-ANG-C-01':[
+    'Adjacent, complementary, supplementary and vertically opposite angles',
+    'Angles at a point and on a straight line',
+    'Transversals on parallel lines — corresponding, alternate, co-interior',
+    'Solve angle problems using angle relationships'
+  ],
+  'MA4-GEO-C-01':[
+    'Types of triangles and the triangle angle sum (180°)',
+    'Exterior angles of triangles',
+    'Types of quadrilaterals and their properties',
+    'Solve geometric problems using triangle and quadrilateral properties'
+  ],
+  'MA4-DAT-C-01':[
+    'Types of data — categorical vs numerical, discrete vs continuous',
+    'Frequency tables and dot plots',
+    'Stem-and-leaf plots and histograms',
+    'Choose appropriate displays for different data types'
+  ],
+  'MA4-DAT-C-02':[
+    'Mean, median and mode — calculate and interpret',
+    'Range — measure of spread',
+    'Interpret and compare datasets using statistics'
+  ],
+  'MA4-PRO-C-01':[
+    'Language of probability — certain, likely, unlikely, impossible',
+    'Probability scale from 0 to 1',
+    'Calculate theoretical probability of simple events',
+    'Experimental probability — conduct trials and record results'
+  ],
+  'EN4-RVL-01':[
+    'Reading strategies — reading pathways, using contextual cues, reading fluency aloud',
+    'Reading for meaning — main ideas, themes, layers of meaning, personal response to characters',
+    'Reading for challenge and enjoyment — sustained reading, diverse texts and perspectives'
+  ],
+  'EN4-URA-01':[
+    'Code and convention — how language forms and features vary by context, purpose and audience',
+    'Connotation, imagery and symbol — how these create layers of meaning',
+    'Point of view — how perspective shapes what a text says and how',
+    'Characterisation — how characters are constructed through language choices',
+    'Narrative — story structure, plot, how narratives are built and work'
+  ],
+  'EN4-URB-01':[
+    'Theme — identifying and explaining central themes in texts',
+    'Perspective and context — how time, place and culture influence a text',
+    'Argument and authority — how texts persuade and who speaks with authority',
+    'Style — how stylistic choices (tone, voice, structure) shape meaning'
+  ],
+  'EN4-URC-01':[
+    'Genre — identifying genre conventions and how they shape reader expectations',
+    'Intertextuality — connections and references between texts',
+    'Literary value — why and how certain texts are considered valuable'
+  ],
+  'EN4-ECA-01':[
+    'Writing imaginative texts — narrative, poetry, descriptive writing features',
+    'Writing informative texts — reports, explanations, how to structure and present information',
+    'Writing persuasive texts — arguments, opinions, persuasive devices',
+    'Sentence grammar and punctuation — accurate and purposeful use for effect',
+    'Word-level language — vocabulary choices, word types and their effect on meaning'
+  ],
+  'EN4-ECB-01':[
+    'Planning — gathering ideas, organising structure and purpose before writing',
+    'Monitoring and revising — drafting, improving and editing own writing',
+    'Reflecting — evaluating own writing process and identifying what works'
+  ],
+  'SC4-WS-01':[
+    'Using scientific tools and instruments correctly and safely',
+    'Making accurate observations and recording them systematically',
+    'Distinguishing between qualitative and quantitative observations',
+    'Using observations to support or challenge predictions'
+  ],
+  'SC4-WS-02':[
+    'Identifying questions that can be investigated scientifically',
+    'Making predictions based on prior scientific knowledge',
+    'Explaining the reasoning behind a prediction',
+    'Distinguishing between a question and a hypothesis'
+  ],
+  'SC4-WS-03':[
+    'Identifying variables — independent, dependent and controlled',
+    'Designing a fair test — controlling variables to make it valid',
+    'Writing a step-by-step investigation procedure',
+    'Identifying safety and ethical considerations in an investigation'
+  ],
+  'SC4-WS-04':[
+    'Following a written procedure accurately and in sequence',
+    'Using equipment correctly and safely during an investigation',
+    'Recording observations and measurements as you go',
+    'Recognising when results seem unexpected and what to do'
+  ],
+  'SC4-WS-05':[
+    'Organising data into tables with correct headings and units',
+    'Choosing the right graph type for your data',
+    'Drawing accurate graphs — axes, scale, labels, title',
+    'Identifying patterns and outliers in processed data'
+  ],
+  'SC4-WS-06':[
+    'Identifying trends and patterns in data',
+    'Comparing results with predictions — did the data support them?',
+    'Drawing evidence-based conclusions from data',
+    'Evaluating reliability — sources of error and how to improve'
+  ],
+  'SC4-WS-07':[
+    'Identifying the problem clearly before choosing a solution strategy',
+    'Generating multiple possible solutions and comparing them',
+    'Applying scientific understanding to propose a plausible solution',
+    'Evaluating whether a proposed solution actually solves the problem'
+  ],
+  'SC4-WS-08':[
+    'Using correct scientific language and terminology in explanations',
+    'Structuring a scientific report — aim, method, results, conclusion',
+    'Choosing the right format for the audience — report, poster, oral',
+    'Acknowledging sources of information in a recognised way'
+  ],
+  'SC4-OTU-01':[
+    'Scientific observation — tools, instruments and the importance of accurate measurement',
+    'Models, theories and laws — how they develop and are revised with new evidence',
+    'The solar system — planets, moons, relative positions and scale',
+    'Earth phenomena — day and night, seasons and eclipses explained by relative positions'
+  ],
+  'SC4-FOR-01':[
+    'Unbalanced forces and motion — predict effects of forces in everyday situations',
+    'Friction — how it opposes motion, factors affecting its size',
+    'Forces at a distance — gravity, electrostatic forces and magnetism',
+    'Energy transfers and transformations — kinetic, potential, heat, light, electrical'
+  ],
+  'SC4-CLS-01':[
+    'Classification of living things — reasons for classifying, major groups, using keys',
+    'Cell structures — nucleus, cytoplasm, membrane, cell wall, chloroplast and their functions',
+    'Unicellular vs multicellular organisms — how cells form tissues, organs and systems',
+    'Adaptations — how features of Australian plants and animals suit their environment'
+  ],
+  'SC4-SOL-01':[
+    'Properties of matter — three states, particle model to explain behaviour',
+    'Pure substances vs mixtures — elements, compounds, mixtures and examples',
+    'Solutions — solute, solvent, dissolving, concentration',
+    'Separation techniques — filtering, evaporation, distillation, chromatography'
+  ],
+  'SC4-LIV-01':[
+    'Photosynthesis and respiration — inputs, outputs and role in living cells',
+    'Organ systems in plants — root, stem, leaf and flower functions',
+    'Organ systems in humans — digestive, circulatory, respiratory, skeletal and muscular',
+    'Reproductive system — role in survival and continuation of species'
+  ],
+  'SC4-PRT-01':[
+    'Elements — what they are, symbols and organisation of the periodic table',
+    'Compounds — formed from elements, chemical formulas, common examples',
+    'Properties of elements and compounds and how properties determine their uses',
+    'History of atomic understanding — how discoveries changed models of matter'
+  ],
+  'SC4-CHG-01':[
+    'Rock types — sedimentary, igneous and metamorphic and how each forms',
+    'Geological processes — weathering, erosion, deposition and Earth structure',
+    'The water cycle — evaporation, condensation, precipitation, groundwater',
+    'Earth resources — renewable vs non-renewable, management and conservation'
+  ],
+  'SC4-DA1-01':[
+    'Types of data — primary vs secondary, qualitative vs quantitative',
+    'Using data to identify trends, patterns and relationships',
+    'Scientific models and predictions — how scientists use data to explain phenomena'
+  ],
+  'GEE4-1':[
+    'Landscapes and landforms — diversity of types and why they exist',
+    'Value of landscapes — aesthetic, cultural, spiritual and economic significance',
+    'Place and liveability — what makes a place liveable for people'
+  ],
+  'GEE4-2':[
+    'Geomorphic processes — how landforms are formed and change over time',
+    'Natural hazards — geomorphic hazards (earthquakes, volcanoes, floods) and effects',
+    'Water cycle and water resources — global and Australian distribution'
+  ],
+  'GEE4-3':[
+    'Interconnections — how people, places and environments connect and affect each other',
+    'Water scarcity and management — effects of uneven water distribution on communities',
+    'Liveability factors — access to services, environmental quality, community connection'
+  ],
+  'GEE4-4':[
+    'Environmental change — how human activity transforms places and environments',
+    'Water management strategies — approaches to sustainable water use',
+    'Landscape management and protection — balancing use and conservation'
+  ],
+  'GEE4-5':[
+    'Global interconnections — how technology, trade and production connect the world',
+    'Effects of globalisation — consequences for people and places near and far',
+    'Water and food security — contemporary challenges at global scale'
+  ],
+  'GEE4-6':[
+    'Perspectives on landscapes and water — why different groups have different views',
+    'Why people value places differently — personal, cultural and economic reasons',
+    'Liveability perspectives — what different people consider important for wellbeing'
+  ],
+  'GEE4-7':[
+    'Management strategies by individuals and communities — practical actions people take',
+    'Government responses to geographical challenges — policies and planning',
+    'Evaluating management effectiveness — judging whether strategies work'
+  ],
+  'PD4-1':[
+    'Identity and change — how transitions (school, puberty, moving) shape who we are',
+    'Strategies to manage change and challenges — what helps people cope',
+    'Resilience — what it is, how to build it and apply it in tough situations'
+  ],
+  'PD4-2':[
+    'Recognising when help is needed — for yourself and noticing in others',
+    'Types of support available — informal (friends, family) and formal (services, professionals)',
+    'Practising help-seeking — how to ask, where to go and overcoming barriers'
+  ],
+  'PD4-3':[
+    'Characteristics of respectful relationships — what respect, trust and equality look like',
+    'Strategies to promote equality and inclusion — standing up, including others',
+    'Power in relationships — recognising unhealthy power dynamics and responding'
+  ],
+  'PD4-4':[
+    'Specialised movement skills — technique and control in specific physical activities',
+    'Combining movement skills into sequences — linking skills smoothly',
+    'Applying skills across a variety of physical activities and contexts'
+  ],
+  'PD4-5':[
+    'Problem-solving in movement — adapting when something is not working',
+    'Adapting to changing conditions — responding to different environments or opponents',
+    'Collaboration in physical activity — teamwork, communication and shared goals'
+  ],
+  'PD4-6':[
+    'Factors influencing health decisions — personal, social, cultural and media influences',
+    'Attitudes and behaviours affecting health — how mindset shapes choices',
+    'Strategies to enhance health and physical activity participation'
+  ],
+  'PD4-7':[
+    'Health information — how to find, evaluate and use reliable sources',
+    'Health services and resources — what is available in the community and online',
+    'Promoting health and wellbeing — taking action for self and others'
+  ],
+  'PD4-8':[
+    'Benefits of physical activity — for body, mind, mood and long-term health',
+    'Planning for physical activity — setting goals and scheduling regular activity',
+    'Participating in a variety of physical activities — breadth of experience'
+  ],
+  'PD4-9':[
+    'Goal setting and decision making — SMART goals, weighing options',
+    'Managing emotions and stress — strategies for regulation in challenging moments',
+    'Applying self-management in complex situations — when multiple pressures are present'
+  ],
+  'PD4-10':[
+    'Communication skills — active listening, assertiveness, verbal and non-verbal',
+    'Conflict resolution strategies — negotiation, compromise, seeking help',
+    'Promoting inclusion and respect in groups — creating welcoming environments'
+  ],
+  'PD4-11':[
+    'Applying movement concepts to improve performance — body awareness, spatial awareness',
+    'Transferring skills across different movement contexts — what carries across sports',
+    'Evaluating and improving movement sequences — identifying what to change'
+  ],
+  'MAR4-1':[
+    'Types of marine environments — oceans, estuaries, rock platforms, coastal wetlands, freshwater',
+    'Australian marine zones — the Exclusive Economic Zone, coastline, reefs and islands',
+    'Components of marine ecosystems — food webs, producers, consumers, decomposers'
+  ],
+  'MAR4-2':[
+    'Tides and currents — how they work, what causes them, how to read tide charts',
+    'Marine biodiversity — range of species in different Australian habitats',
+    'How marine environments support life — temperature, salinity, light and nutrients'
+  ],
+  'MAR4-3':[
+    'The marine environment as a fisheries resource — commercial and recreational fishing in Australia',
+    'Effects of human activity on native fish stocks — overfishing, habitat destruction, pollution',
+    'Fishing regulations — bag limits, size limits, closed seasons and protected species'
+  ],
+  'MAR4-4':[
+    'Sustainable fishing practices — catch and release, gear selection, responsible behaviour',
+    'Bycatch and its impacts — unintended catch and how to reduce it',
+    'Marine conservation — protected areas, threatened species and recovery programs'
+  ],
+  'MAR4-5':[
+    'What is aquaculture — types, scale and purpose, difference from wild fishing',
+    'Species suitable for aquaculture — fish, shellfish, crustaceans and seaweed in Australia',
+    'Aquaculture systems — tanks, sea cages, ponds and recirculating systems'
+  ],
+  'MAR4-6':[
+    'Managing water quality in aquaculture — temperature, oxygen, pH, waste',
+    'Feeding and growth in aquaculture — nutrition and production cycles',
+    'Environmental impacts of aquaculture — managing risks to wild ecosystems'
+  ],
+  'MAR4-7':[
+    'Why we need to protect marine environments — threats including pollution, climate and overfishing',
+    'Conservation strategies — marine protected areas, community action, government policy',
+    'Safe and responsible behaviour in the marine environment — safety rules, ethics'
+  ],
+  'MAR4-8':[
+    'Ethics of using marine resources — rights vs responsibilities, sustainability mindset',
+    'Indigenous connections to the marine environment — traditional knowledge and sea country',
+    'Taking personal action — what Jack can do as a fisherman and marine user'
+  ],
+  'MAR4-9':[
+    'Fishing equipment — rods, reels, lines, hooks, sinkers, floats, bait and lures',
+    'Setting up tackle — how to rig a line, tie knots, match gear to target species',
+    'Bait and lure selection — what works for different species and conditions'
+  ],
+  'MAR4-10':[
+    'Reading instructions with accuracy — safety signs, gear manuals, fishing rules',
+    'Navigation basics — reading a waterway, understanding charts and GPS',
+    'Weather awareness — reading forecasts, understanding conditions for safe fishing'
+  ],
+  'MAR4-11':[
+    'Employment in fishing and aquaculture — commercial fisher, aquaculture worker, marine scientist',
+    'Employment in marine and maritime industries — boat building, marine tourism, conservation',
+    'Pathways and training — how to enter marine industry careers'
+  ],
+  'MAR4-12':[
+    'Volunteer marine organisations — Marine Rescue, Coastguard, Fishcare volunteers',
+    'What volunteers do — search and rescue, education, habitat restoration',
+    'How to get involved — joining local groups, junior programs'
+  ],
+  'MAR4-13':[
+    'Researching marine topics — finding reliable sources, evaluating information',
+    'Presenting marine research — communicating findings clearly to an audience',
+    'Connecting research to real issues — applying knowledge to current marine problems'
+  ],
+  'MAR4-14':[
+    'Marine communication signals — distress signals, flags, light signals',
+    'VHF radio basics — channels, Mayday calls, communicating on the water',
+    'Signs, conventions and terminology — reading waterway markers and understanding marine language'
+  ]
+};;
 const SCOL={Maths:'sub-maths',English:'sub-english',Science:'sub-science',Geography:'sub-geography',PDHPE:'sub-pdhpe','Aquatic Technology':'sub-aquatic'};
 const SCLS={'Not Started':'status-not-started','Partially':'status-partially','Covered':'status-covered','Mastered':'status-mastered'};
 const BCOL={Maths:'#ff6b35',English:'#6c63ff',Science:'#4ecdc4',Geography:'#f7b731',PDHPE:'#ee5a92','Aquatic Technology':'#45aaf2'};
@@ -610,7 +996,7 @@ const STATUS_OPTIONS=['Not Started','Partially','Covered','Mastered'];
 // ============================================================
 // STATE
 // ============================================================
-var state={apiKey:'',sheetsUrl:'',outcomes:{},activities:{},currentWeekOffset:0,hyperfocus:'',energy:'mixed',location:'either',lesson:'standard',realWorldContext:'',dayOverrides:{},weekNotes:{},lastSynced:'',carryOvers:{}};
+var state={apiKey:'',sheetsUrl:'',outcomes:{},subTopics:{},activities:{},currentWeekOffset:0,hyperfocus:'',energy:'mixed',locationFlags:[],lesson:'standard',realWorldContext:'',dayOverrides:{},weekNotes:{},lastSynced:'',carryOvers:{}};
 
 function loadState(){
   try{var s=localStorage.getItem('jackHS4');if(s){var p=JSON.parse(s);Object.assign(state,p);}}catch(e){}
@@ -685,6 +1071,68 @@ function setToggle(type,val,btn){
   if(type==='location'){state.location=val;document.querySelectorAll('#locationRow .tog-btn').forEach(function(b){b.classList.remove('active');});}
   if(type==='lesson'){state.lesson=val;document.querySelectorAll('#lessonRow .tog-btn').forEach(function(b){b.classList.remove('active');});}
   btn.classList.add('active');
+  saveState();
+}
+
+// ============================================================
+// SUB-TOPIC HELPERS
+// ============================================================
+function getNextSubTopic(outcomeCode){
+  var subs=SUBTOPICS[outcomeCode]||[];
+  if(!subs.length)return null;
+  var done=state.subTopics[outcomeCode]||{};
+  for(var i=0;i<subs.length;i++){
+    if(!done[i]||done[i]==='skipped'){
+      return {index:i,text:subs[i],total:subs.length};
+    }
+  }
+  return null; // all done
+}
+
+function getSubTopicProgress(outcomeCode){
+  var subs=SUBTOPICS[outcomeCode]||[];
+  if(!subs.length)return null;
+  var done=state.subTopics[outcomeCode]||{};
+  var covered=0;
+  for(var i=0;i<subs.length;i++){
+    if(done[i]==='done')covered++;
+  }
+  return {covered:covered,total:subs.length,subs:subs,done:done};
+}
+
+function markSubTopicDone(outcomeCode,subIndex){
+  if(!state.subTopics[outcomeCode])state.subTopics[outcomeCode]={};
+  state.subTopics[outcomeCode][subIndex]='done';
+}
+
+function skipSubTopic(outcomeCode,subIndex){
+  if(!state.subTopics[outcomeCode])state.subTopics[outcomeCode]={};
+  state.subTopics[outcomeCode][subIndex]='skipped';
+}
+
+function calcOutcomeStatusFromSubTopics(outcomeCode){
+  var prog=getSubTopicProgress(outcomeCode);
+  if(!prog||!prog.total)return null;
+  if(prog.covered===0)return 'Not Started';
+  if(prog.covered===prog.total)return 'Covered';
+  return 'Partially';
+}
+
+
+function confirmMastered(code){
+  if(!confirm('Mark '+code+' as Mastered? This means Jack can do it independently and consistently.'))return;
+  var today=new Date().toLocaleDateString('en-AU');
+  state.outcomes[code]=Object.assign({},state.outcomes[code],{status:'Mastered',lastUpdated:today});
+  saveState();
+  renderOutcomesTab();
+  toast('\uD83C\uDFC6 '+code+' marked as Mastered!');
+}
+
+function toggleLocFlag(flag,btn){
+  if(!state.locationFlags)state.locationFlags=[];
+  var i=state.locationFlags.indexOf(flag);
+  if(i>=0){state.locationFlags.splice(i,1);btn.classList.remove('active');}
+  else{state.locationFlags.push(flag);btn.classList.add('active');}
   saveState();
 }
 
@@ -769,7 +1217,8 @@ async function generateDay(day,silent){
     var outcome=subjectOutcomes.find(function(o){return (state.outcomes[o.code]&&state.outcomes[o.code].status||'Not Started')!=='Mastered';})||subjectOutcomes[subjectOutcomes.length-1];
     try{
       var activity=await callGenerateAPI(day,subject,outcome,carryOver);
-      var act=Object.assign({day:day,subject:subject,outcomeCode:outcome.code,completed:false,skipped:false},activity);
+      var _stInfo=getNextSubTopic(outcome.code);
+      var act=Object.assign({day:day,subject:subject,outcomeCode:outcome.code,subTopicIndex:_stInfo?_stInfo.index:null,subTopicText:_stInfo?_stInfo.text:null,completed:false,skipped:false},activity);
       if(carryOver){act.carriedOver=true;delete state.carryOvers[carryKey];}
       newActs.push(act);
     }catch(e){
@@ -785,7 +1234,7 @@ async function generateDay(day,silent){
 
 async function callGenerateAPI(day,subject,outcome,carryOver){
   var energyMap={mixed:'could be high-energy/physical OR calm desk-based',high:'should be active and physical, movement-based where possible',low:'should be calm, desk-based or creative'};
-  var locationMap={either:'can be indoors or outdoors',indoors:'MUST be indoors',outdoors:'should be outdoors where possible'};
+  var locationMap={either:'can be indoors or outdoors',indoors:'MUST be indoors',outdoors:'should be outdoors where possible',screen:'MUST be screen-only — no pen, paper, scissors, or any physical materials at all. The entire activity happens on the device. For Maths use mental calculation or typed answers. For English type responses. For Science watch/discuss/research. For all subjects: zero physical materials required.'};
   var lessonMap={
     quick:{
       label:'QUICK SESSION (15 minutes)',
@@ -823,7 +1272,8 @@ async function callGenerateAPI(day,subject,outcome,carryOver){
     'Aquatic Technology':'Connect to real fishing, snorkelling or marine activities. Include a Marine Fact about the concept.'
   };
   var subjectNote=subjectNotes[subject]||'';
-  var prompt="You are a specialist homeschool teacher who understands ADHD learners well. Design an activity for Jack, Stage 4 student in NSW Australia who has ADHD.\n\nADHD rules — always apply:\n- 4-6 short steps with time estimates\n- Start with the most engaging part first\n- Include a brain break suggestion for halfway\n- Use simple language and worked examples, not walls of text\n- End with something Jack can feel proud of\n- Warm encouraging tone throughout\n\nMATERIALS RULE: Jack lives 30 minutes from town in the bush. ALL materials must be common household items (paper, pens, water, food, sticks, rocks etc). NO specialty items or anything needing a shop.\n"+hyperfocusLine+realWorldLine+carryLine+"\n\nEnergy: "+state.energy+" — activity "+energyMap[state.energy]+"\nLocation: "+state.location+" — activity "+locationMap[state.location]+"\\nLesson: "+lessonConfig.label+"\\n"+lessonConfig.instructions+"\\nSubject: "+subject+" | Day: "+day+"\nOutcome: "+outcome.code+" — "+outcome.desc+"\nCurrent status: "+((state.outcomes[outcome.code]&&state.outcomes[outcome.code].status)||'Not Started')+"\n\n"+subjectNote+"\n\nReply ONLY with a JSON object, no markdown, no backticks:\n{\"title\":\"short catchy title\",\"adhdStyle\":\"movement or desk or creative or outdoor\",\"duration\":\"e.g. 45 min\",\"brainBreak\":\"2 min movement break idea\",\"conceptExplainer\":{\"heading\":\"What is X?\",\"explanation\":\"plain English 2-3 sentences\",\"example\":\"worked example\"},\"materials\":[\"household item\"],\"steps\":[{\"text\":\"what to do\",\"time\":\"X min\"}],\"practiceQuestions\":[{\"question\":\"Q\",\"answer\":\"A\",\"hint\":\"hint\"}],\"activitySummary\":\"past tense 1-2 sentence summary for records\",\"outcomeLink\":\"one sentence connecting to outcome\",\"hyperfocusConnection\":\"connection to interest or empty string\",\"encouragement\":\"short upbeat line for Jack\"}";
+  var _locStr=(function(){var f=state.locationFlags||[];if(!f.length)return '';var p=[];if(f.indexOf('indoors')>=0)p.push('Indoors');if(f.indexOf('outdoors')>=0)p.push('Outdoors');if(f.indexOf('screen')>=0)p.push('Screen-only (NO physical materials)');return '\\nLocation/constraints: '+p.join(' and ')+'.';})();
+  var prompt="You are a specialist homeschool teacher who understands ADHD learners well. Design an activity for Jack, Stage 4 student in NSW Australia who has ADHD.\n\nADHD rules — always apply:\n- 4-6 short steps with time estimates\n- Start with the most engaging part first\n- Include a brain break suggestion for halfway\n- Use simple language and worked examples, not walls of text\n- End with something Jack can feel proud of\n- Warm encouraging tone throughout\n\nMATERIALS RULE: Jack lives 30 minutes from town in the bush. ALL materials must be common household items (paper, pens, water, food, sticks, rocks etc). NO specialty items or anything needing a shop.\n"+hyperfocusLine+realWorldLine+carryLine+"\n\nEnergy: "+state.energy+" — activity "+energyMap[state.energy]+"\\nLocation: "+_locStr+"\\\\nLesson: "+lessonConfig.label+"\\n"+lessonConfig.instructions+"\\nSubject: "+subject+" | Day: "+day+"\nOutcome: "+outcome.code+" — "+outcome.desc+"\n"+(function(){var st=getNextSubTopic(outcome.code);return st?"TODAY\'S FOCUS — Sub-topic "+(st.index+1)+" of "+st.total+": "+st.text+"\nFocus this ENTIRE activity specifically on this sub-topic. Do not cover other aspects of the outcome.":"";})()+"\nCurrent status: "+((state.outcomes[outcome.code]&&state.outcomes[outcome.code].status)||'Not Started')+"\n\n"+subjectNote+"\n\nReply ONLY with a JSON object, no markdown, no backticks:\n{\"title\":\"short catchy title\",\"adhdStyle\":\"movement or desk or creative or outdoor\",\"duration\":\"e.g. 45 min\",\"brainBreak\":\"2 min movement break idea\",\"conceptExplainer\":{\"heading\":\"What is X?\",\"explanation\":\"plain English 2-3 sentences\",\"example\":\"worked example\"},\"materials\":[\"household item\"],\"steps\":[{\"text\":\"what to do\",\"time\":\"X min\"}],\"practiceQuestions\":[{\"question\":\"Q\",\"answer\":\"A\",\"hint\":\"hint\"}],\"activitySummary\":\"past tense 1-2 sentence summary for records\",\"outcomeLink\":\"one sentence connecting to outcome\",\"hyperfocusConnection\":\"connection to interest or empty string\",\"encouragement\":\"short upbeat line for Jack\"}";
 
   var response=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
@@ -864,14 +1314,19 @@ function renderActivityCard(el,act,idx){
       var optLines=lines.slice(1);
       var safeAns=String(q.answer||'').trim().toUpperCase().replace(/'/g,'&#39;');
       var optBtns=optLines.map(function(o){
-        var letter=(o.trim().charAt(0)||'A').toUpperCase();
-        return '<button onclick="checkMcAnswer('+idx+','+qi+',\''+letter+'\',\''+safeAns+'\',\''+hint+'\')" '
-          +'id="mcbtn-'+idx+'-'+qi+'-'+letter+'" '
-          +'style="display:block;width:100%;text-align:left;margin-bottom:5px;padding:8px 12px;'
-          +'border:2px solid var(--border);border-radius:8px;background:white;'
-          +'font-family:Nunito,sans-serif;font-size:14px;cursor:pointer;">'
-          +o.trim()+'</button>';
-      }).join('');
+            var letter=(o.trim().charAt(0)||'A').toUpperCase();
+            var safeFieldAns2=String(q.answer||'').trim().toUpperCase().replace(/"/g,'&quot;');
+            var safeHint2=(q.hint||'').replace(/"/g,'&quot;');
+            return '<button '
+              +'data-actidx="-1" data-qidx="'+qi+'" data-letter="'+letter+'" '
+              +'data-ans="'+safeFieldAns2+'" data-hint="'+safeHint2+'" '
+              +'id="mcbtn--1-'+qi+'-'+letter+'" '
+              +'class="mc-option-btn field-mc-btn" '
+              +'style="display:block;width:100%;text-align:left;margin-bottom:6px;padding:10px 14px;'
+              +'border:2px solid #3a5c3a;border-radius:10px;background:transparent;'
+              +'color:white;font-family:Nunito,sans-serif;font-size:15px;cursor:pointer;">'
+              +o.trim()+'</button>';
+          }).join('');
       return '<div class="ia-q"><p>'+(qi+1)+'. '+qMain+'</p>'
         +optBtns
         +'<div class="ia-fb" id="pq-fb-'+idx+'-'+qi+'"></div></div>';
@@ -905,6 +1360,7 @@ function renderActivityCard(el,act,idx){
   var btnRowHtml='<div class="btn-row">'
     +'<button class="complete-btn'+(completed?' done':'')+'" onclick="markComplete('+idx+')">'+(completed?'\u2705 Completed!':'\u2713 Mark as Complete')+'</button>'
     +(!completed&&!act.skipped?'<button class="skip-btn" onclick="skipActivity('+idx+')">\u21A9 Carry Over</button>':'')
+    +(!completed?'<button class="regen-subject-btn" data-day="'+act.day+'" data-subject="'+act.subject+'" data-actidx="'+idx+'" style="padding:8px 16px;border:2px solid var(--accent5);background:white;color:var(--accent5);border-radius:20px;font-family:Nunito,sans-serif;font-weight:800;font-size:12px;cursor:pointer;margin-left:0">&#8635; Regenerate</button>':'')
     +skipBadge
     +'</div>';
 
@@ -919,6 +1375,7 @@ function renderActivityCard(el,act,idx){
     +'</div>'
     +'<span class="expand-icon" id="expand-'+idx+'">\u25BE</span>'
     +'</div>'
+        +(act.subTopicText?'<div style="font-size:11px;color:var(--accent5);font-weight:700;padding:3px 14px;background:rgba(108,99,255,0.07);border-bottom:1px solid rgba(108,99,255,0.15)">&#127919; Focus: '+act.subTopicText+'</div>':'')
     +'<div class="activity-body" id="body-'+idx+'">'
     +'<div class="activity-content">'
     +'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">'
@@ -990,9 +1447,18 @@ function markComplete(idx){
   if(!acts||!acts[idx])return;
   acts[idx].completed=true;
   var code=acts[idx].outcomeCode;
+  // Mark the sub-topic as done if this activity targeted one
+  var subIdx=acts[idx].subTopicIndex;
+  if(subIdx!==undefined&&subIdx!==null){
+    markSubTopicDone(code,subIdx);
+  }
+  // Calculate status from sub-topic progress, fall back to simple increment
+  var stStatus=calcOutcomeStatusFromSubTopics(code);
   var cur=(state.outcomes[code]&&state.outcomes[code].status)||'Not Started';
   var nextMap={'Not Started':'Partially','Partially':'Covered','Covered':'Mastered','Mastered':'Mastered'};
-  var nextStatus=nextMap[cur]||'Covered';
+  var nextStatus=stStatus||(nextMap[cur]||'Covered');
+  // Never auto-set Mastered — that requires manual confirmation
+  if(nextStatus==='Mastered'&&stStatus==='Mastered')nextStatus='Covered';
   var today=new Date().toLocaleDateString('en-AU');
   state.outcomes[code]=Object.assign({},state.outcomes[code],{
     status:nextStatus,lastUpdated:today,
@@ -1146,9 +1612,21 @@ function renderOutcomes(){
   document.getElementById('outcomesBody').innerHTML=filtered.map(function(o){
     var od=state.outcomes[o.code]||{};
     var statusClass=SCLS[od.status]||'status-not-started';
+    var stProg=getSubTopicProgress(o.code);
+    var stBar=stProg?'<div style="margin-top:5px">'
+      +'<div style="font-size:10px;color:var(--muted);margin-bottom:2px">Sub-topics: '+stProg.covered+' / '+stProg.total+'</div>'
+      +'<div style="display:flex;gap:3px;flex-wrap:wrap">'
+      +stProg.subs.map(function(s,si){
+        var isDone=stProg.done[si]==='done';
+        var isSkip=stProg.done[si]==='skipped';
+        var bg=isDone?'var(--accent2)':isSkip?'#f7b731':'var(--border)';
+        return '<div title="'+s+'" style="width:14px;height:14px;border-radius:3px;background:'+bg+';cursor:default"></div>';
+      }).join('')
+      +'</div></div>':''
+    +(stProg&&od.status==='Covered'?'<button onclick="confirmMastered(\''+o.code+'\')" style="margin-top:6px;padding:3px 8px;background:var(--accent5);color:white;border:none;border-radius:10px;font-size:10px;font-weight:800;cursor:pointer">&#127942; Confirm Mastered</button>':'');
     return '<tr>'
       +'<td><span class="outcome-code">'+o.code+'</span></td>'
-      +'<td><span class="subject-pill '+(SCOL[o.subject]||'sub-maths')+'" style="font-size:10px;margin-bottom:4px;display:inline-block">'+o.subject+'</span><br>'+o.desc+'</td>'
+      +'<td><span class="subject-pill '+(SCOL[o.subject]||'sub-maths')+'" style="font-size:10px;margin-bottom:4px;display:inline-block">'+o.subject+'</span><br>'+o.desc+stBar+'</td>'
       +'<td><select class="status-select" onchange="updateStatus(\''+o.code+'\',this.value)">'
       +STATUS_OPTIONS.map(function(s){return '<option'+(od.status===s?' selected':'')+'>'+s+'</option>';}).join('')
       +'</select></td>'
@@ -1217,7 +1695,22 @@ async function pushToSheets(){
   if(!state.sheetsUrl){toast('\u26A0\uFE0F No Sheets URL — check Settings');return;}
   setSyncStatus('Syncing\u2026','syncing');
   var pushBtn=document.getElementById('pushBtn');if(pushBtn)pushBtn.disabled=true;
-  var outcomeRows=OUTCOMES.map(function(o){var od=state.outcomes[o.code]||{};return {subject:o.subject,code:o.code,outcome:o.desc,status:od.status||'Not Started',evidence:od.evidence||'',lastActivityTitle:od.lastActivityTitle||'',lastActivitySummary:od.lastActivitySummary||'',lastActivityWeek:od.lastActivityWeek||'',activitiesCount:od.activitiesCount||0,lastUpdated:od.lastUpdated||''};});
+  var outcomeRows=OUTCOMES.map(function(o){
+    var od=state.outcomes[o.code]||{};
+    var prog=getSubTopicProgress(o.code);
+    var stProgress=prog?(prog.covered+' of '+prog.total+' done'):'0 of '+(SUBTOPICS[o.code]||[]).length+' done';
+    var stDetail=prog?prog.subs.map(function(s,i){
+      var d=prog.done[i];
+      return (d==='done'?'✓ ':d==='skipped'?'↷ ':'○ ')+s;
+    }).join('\n'):(SUBTOPICS[o.code]||[]).map(function(s){return '○ '+s;}).join('\n');
+    return {subject:o.subject,code:o.code,outcome:o.desc,
+      status:od.status||'Not Started',evidence:od.evidence||'',
+      lastActivityTitle:od.lastActivityTitle||'',
+      lastActivitySummary:od.lastActivitySummary||'',
+      lastActivityWeek:od.lastActivityWeek||'',
+      activitiesCount:od.activitiesCount||0,lastUpdated:od.lastUpdated||'',
+      subTopicsProgress:stProgress,subTopicsDetail:stDetail};
+  });
   var historyRows=[];
   Object.keys(state.activities).forEach(function(weekKey){
     (state.activities[weekKey]||[]).forEach(function(act){
@@ -1251,7 +1744,22 @@ async function pullFromSheets(){
     var res=await fetch(state.sheetsUrl+'?action=pull');
     var json=await res.json();
     if(json.status==='ok'&&json.outcomes){
-      json.outcomes.forEach(function(row){if(state.outcomes[row.code]){state.outcomes[row.code]=Object.assign({},state.outcomes[row.code],{status:row.status||'Not Started',evidence:row.evidence||'',lastActivityTitle:row.lastActivityTitle||'',lastActivitySummary:row.lastActivitySummary||'',lastActivityWeek:row.lastActivityWeek||'',activitiesCount:parseInt(row.activitiesCount)||0,lastUpdated:row.lastUpdated||''});}});
+      json.outcomes.forEach(function(row){
+        if(!state.outcomes[row.code])state.outcomes[row.code]={};
+        // Smart merge — never downgrade status
+        var STATUS_LEVELS={'Not Started':0,'Partially':1,'Covered':2,'Mastered':3};
+        var existing=(state.outcomes[row.code]&&state.outcomes[row.code].status)||'Not Started';
+        var incoming=row.status||'Not Started';
+        var useStatus=(STATUS_LEVELS[incoming]||0)>=(STATUS_LEVELS[existing]||0)?incoming:existing;
+        state.outcomes[row.code]=Object.assign({},state.outcomes[row.code],{
+          status:useStatus,evidence:row.evidence||'',
+          lastActivityTitle:row.lastActivityTitle||'',
+          lastActivitySummary:row.lastActivitySummary||'',
+          lastActivityWeek:row.lastActivityWeek||'',
+          activitiesCount:parseInt(row.activitiesCount)||0,
+          lastUpdated:row.lastUpdated||''
+        });
+      });
       saveState();
       var now=new Date().toLocaleString('en-AU');setSyncStatus('Pulled: '+now);
       var slt=document.getElementById('syncLastTime');if(slt)slt.textContent='Last pulled: '+now;
@@ -1588,6 +2096,33 @@ function fieldSkip(){
   fieldNav(1);
 }
 
+async function regenSubjectActivity(day, subject, actIdx){
+  if(!state.apiKey){toast('Please enter your API key first');return;}
+  var weekKey=getWeekKey(state.currentWeekOffset);
+  var acts=state.activities[weekKey];
+  if(!acts||!acts[actIdx])return;
+  // Replace the card with a loading indicator
+  var cards=document.querySelectorAll('#activitiesList .activity-card');
+  if(cards[actIdx]){
+    cards[actIdx].innerHTML='<div class="loading-activity"><div class="spinner"></div> Regenerating '+subject+' activity for '+day+'...</div>';
+  }
+  var subjectOutcomes=OUTCOMES.filter(function(o){return o.subject===subject;});
+  var outcome=subjectOutcomes.find(function(o){return (state.outcomes[o.code]&&state.outcomes[o.code].status||'Not Started')!=='Mastered';});
+  if(!outcome)outcome=subjectOutcomes[subjectOutcomes.length-1];
+  try{
+    var activity=await callGenerateAPI(day,subject,outcome,null);
+    var _stRegen=getNextSubTopic(outcome.code);
+    var newAct=Object.assign({day:day,subject:subject,outcomeCode:outcome.code,subTopicIndex:_stRegen?_stRegen.index:null,subTopicText:_stRegen?_stRegen.text:null,completed:false,skipped:false},activity);
+    acts[actIdx]=newAct;
+    saveState();
+    if(cards[actIdx])renderActivityCard(cards[actIdx],newAct,actIdx);
+    toast('New '+subject+' activity generated!');
+  }catch(e){
+    if(cards[actIdx])cards[actIdx].innerHTML='<div style="padding:14px 18px;color:#dc3545;font-weight:700">Failed to regenerate. Try again.</div>';
+    toast('Regeneration failed: '+e.message);
+  }
+}
+
 // ============================================================
 // PRINT MODAL
 // ============================================================
@@ -1700,6 +2235,32 @@ function executePrint(){
 }
 
 // ============================================================
+// MC BUTTON EVENT DELEGATION (mobile-safe)
+// ============================================================
+document.addEventListener('click', function(e){
+  // MC option buttons
+  var mcBtn = e.target.closest('.mc-option-btn');
+  if(mcBtn){
+    var actIdx = parseInt(mcBtn.getAttribute('data-actidx'));
+    var qIdx   = parseInt(mcBtn.getAttribute('data-qidx'));
+    var letter = mcBtn.getAttribute('data-letter');
+    var ans    = mcBtn.getAttribute('data-ans');
+    var hint   = mcBtn.getAttribute('data-hint');
+    checkMcAnswer(actIdx, qIdx, letter, ans, hint);
+    return;
+  }
+  // Per-subject regenerate buttons
+  var regenBtn = e.target.closest('.regen-subject-btn');
+  if(regenBtn){
+    var day     = regenBtn.getAttribute('data-day');
+    var subject = regenBtn.getAttribute('data-subject');
+    var actIdx  = parseInt(regenBtn.getAttribute('data-actidx'));
+    regenSubjectActivity(day, subject, actIdx);
+    return;
+  }
+});
+
+// ============================================================
 // TOAST
 // ============================================================
 function toast(msg){var el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);setTimeout(function(){el.remove();},3100);}
@@ -1720,7 +2281,12 @@ if(state.sheetsUrl){document.getElementById('syncBar').style.display='flex';docu
   var energyBtns=document.querySelectorAll('#energyRow .tog-btn');
   energyBtns.forEach(function(b){b.classList.remove('active');if(b.textContent.toLowerCase().indexOf(state.energy)>=0)b.classList.add('active');});
   var locBtns=document.querySelectorAll('#locationRow .tog-btn');
-  locBtns.forEach(function(b){b.classList.remove('active');if(b.textContent.toLowerCase().indexOf(state.location||'either')>=0)b.classList.add('active');});
+  var _sf=state.locationFlags||[];
+  locBtns.forEach(function(b){
+    var _lf=b.getAttribute('data-locflag');
+    if(_lf&&_sf.indexOf(_lf)>=0)b.classList.add('active');
+    else b.classList.remove('active');
+  });
   var lessonBtns=document.querySelectorAll('#lessonRow .tog-btn');
   var lessonVal=state.lesson||'standard';
   lessonBtns.forEach(function(b){b.classList.remove('active');if(b.getAttribute('onclick')&&b.getAttribute('onclick').indexOf("'"+lessonVal+"'")>=0)b.classList.add('active');});
