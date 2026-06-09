@@ -1433,13 +1433,19 @@ function checkAnswer(actIdx,qIdx,correctAnswer,hint){
   var fb=document.getElementById('pq-fb-'+actIdx+'-'+qIdx);
   if(!input||!fb)return;
   var val=normaliseAnswer(input.value);
+  if(!val){fb.className='ia-fb wrong';fb.textContent='Type your answer first!';return;}
   var acceptableRaw=correctAnswer.split('|').map(function(s){return s.trim();});
   var acceptable=acceptableRaw.map(normaliseAnswer);
-  var isCorrect=acceptable.some(function(a){return val===a;});
-  if(isCorrect){
-    fb.className='ia-fb correct';fb.textContent='\uD83C\uDF89 Correct! Brilliant work Jack!';
+  var isShort=acceptable.every(function(a){return a.length<=20;});
+  if(isShort){
+    var isCorrect=acceptable.some(function(a){return val===a;});
+    if(isCorrect){
+      fb.className='ia-fb correct';fb.textContent='\uD83C\uDF89 Correct! Brilliant work Jack!';
+    }else{
+      fb.className='ia-fb wrong';fb.textContent='Not quite \u2014 '+hint+' (Answer: '+acceptableRaw.join(' or ')+')';
+    }
   }else{
-    fb.className='ia-fb wrong';fb.textContent='Not quite \u2014 '+hint+' (Answer: '+acceptableRaw.join(' or ')+')';
+    fb.className='ia-fb correct';fb.textContent='\u2139\uFE0F Model answer: '+acceptableRaw[0]+(hint?' ('+hint+')':'');
   }
 }
 
@@ -2079,8 +2085,8 @@ function renderFieldActivity(){
           }).join('');
           return '<div class="field-q"><p>'+(qi+1)+'. '+qText+'</p>'+optBtns+'<div class="field-q-fb" id="fq-fb-'+qi+'"></div></div>';
         } else {
-          var rawFieldAns=(q.answer||'').replace(/"/g,'&quot;');
-          var rawFieldHint=(q.hint||'').replace(/"/g,'&quot;');
+          var rawFieldAns=(q.answer||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/\n/g,' ').replace(/\r/g,'');
+          var rawFieldHint=(q.hint||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/\n/g,' ').replace(/\r/g,'');
           return '<div class="field-q">'
             +'<p>'+(qi+1)+'. '+(q.question||'')+'</p>'
             +'<input class="field-q-input" type="text" placeholder="Type your answer..." id="fq-'+qi+'">'
@@ -2119,16 +2125,25 @@ function fieldNav(dir){
 function checkFieldAnswer(qi,correctAnswer,hint){
   var input=document.getElementById('fq-'+qi);
   var fb=document.getElementById('fq-fb-'+qi);
-  if(!input||!fb)return;
+  if(!input||!fb){return;}
   var val=normaliseAnswer(input.value);
+  if(!val){fb.className='field-q-fb wrong';fb.textContent='Type your answer first!';return;}
   var raw=correctAnswer.replace(/&#(\d+);/g,function(m,c){return String.fromCharCode(c);});
   var acceptableRaw=raw.split('|').map(function(s){return s.trim();});
   var acceptable=acceptableRaw.map(normaliseAnswer);
-  var isCorrect=acceptable.some(function(a){return val===a;});
-  if(isCorrect){
-    fb.className='field-q-fb correct';fb.textContent='Correct! Brilliant work Jack!';
+  // For short answers (symbols, numbers, single words) do exact match
+  // For long/open-ended answers, just reveal the answer for self-marking
+  var isShort=acceptable.every(function(a){return a.length<=20;});
+  if(isShort){
+    var isCorrect=acceptable.some(function(a){return val===a;});
+    if(isCorrect){
+      fb.className='field-q-fb correct';fb.textContent='\uD83C\uDF89 Correct! Brilliant work Jack!';
+    }else{
+      fb.className='field-q-fb wrong';fb.textContent='Not quite \u2014 '+hint+' (Answer: '+acceptableRaw.join(' or ')+')';
+    }
   }else{
-    fb.className='field-q-fb wrong';fb.textContent='Not quite — '+hint+' (Answer: '+acceptableRaw.join(' or ')+')';
+    // Open-ended: show the answer so Jack can self-mark
+    fb.className='field-q-fb correct';fb.textContent='\u2139\uFE0F Model answer: '+acceptableRaw[0]+(hint?' ('+hint+')':'');
   }
 }
 
