@@ -1444,26 +1444,35 @@ function checkAnswer(actIdx,qIdx,correctAnswer,hint){
 }
 
 function checkMcAnswer(actIdx,qIdx,selectedLetter,correctLetter,hint){
-  var fb=document.getElementById('pq-fb-'+actIdx+'-'+qIdx);
+  var isField = (actIdx === 'field');
+  var fb = isField
+    ? document.getElementById('fq-fb-'+qIdx)
+    : document.getElementById('pq-fb-'+actIdx+'-'+qIdx);
   if(!fb)return;
   var correct=correctLetter.trim().toUpperCase();
   var selected=selectedLetter.trim().toUpperCase();
   var letters=['A','B','C','D'];
   letters.forEach(function(l){
-    var btn=document.getElementById('mcbtn-'+actIdx+'-'+qIdx+'-'+l);
+    var btnId = isField ? 'mcbtn-field-'+qIdx+'-'+l : 'mcbtn-'+actIdx+'-'+qIdx+'-'+l;
+    var btn=document.getElementById(btnId);
     if(!btn)return;
     if(l===correct){
-      btn.style.background='#d4edda';btn.style.borderColor='#28a745';btn.style.color='#155724';
+      btn.style.background=isField?'#1a5c2a':'#d4edda';
+      btn.style.borderColor='#28a745';
+      btn.style.color=isField?'#a8e6a8':'#155724';
     } else if(l===selected&&selected!==correct){
-      btn.style.background='#f8d7da';btn.style.borderColor='#dc3545';btn.style.color='#721c24';
+      btn.style.background=isField?'#5c1a1a':'#f8d7da';
+      btn.style.borderColor='#dc3545';
+      btn.style.color=isField?'#e6a8a8':'#721c24';
     }
     btn.style.cursor='default';
     btn.onclick=null;
   });
+  var fbClass = isField ? 'field-q-fb' : 'ia-fb';
   if(selected===correct){
-    fb.className='ia-fb correct';fb.textContent='Correct! Brilliant work Jack!';
+    fb.className=fbClass+' correct';fb.textContent='Correct! Brilliant work Jack!';
   } else {
-    fb.className='ia-fb wrong';fb.textContent='Not quite — '+hint+' (Correct answer: '+correct+')';
+    fb.className=fbClass+' wrong';fb.textContent='Not quite — '+hint+' (Correct answer: '+correct+')';
   }
 }
 
@@ -2054,11 +2063,15 @@ function renderFieldActivity(){
           var lines=(q.question||'').split('\n');
           var qText=lines[0];
           var optLines=lines.slice(1);
-          var safeAns=String(q.answer||'').trim().toUpperCase().replace(/'/g,'&#39;');
+          var safeAns2=String(q.answer||'').trim().toUpperCase().replace(/"/g,'&quot;');
+          var safeHint2=(q.hint||'').replace(/"/g,'&quot;');
           var optBtns=optLines.map(function(o){
             var letter=(o.trim().charAt(0)||'A').toUpperCase();
-            return '<button onclick="checkMcAnswer(-1,'+qi+',\''+letter+'\',\''+safeAns+'\',\''+hint+'\')" '
-              +'id="mcbtn--1-'+qi+'-'+letter+'" '
+            return '<button '
+              +'data-actidx="field" data-qidx="'+qi+'" data-letter="'+letter+'" '
+              +'data-ans="'+safeAns2+'" data-hint="'+safeHint2+'" '
+              +'id="mcbtn-field-'+qi+'-'+letter+'" '
+              +'class="mc-option-btn" '
               +'style="display:block;width:100%;text-align:left;margin-bottom:6px;padding:10px 14px;'
               +'border:2px solid #3a5c3a;border-radius:10px;background:transparent;'
               +'color:white;font-family:Nunito,sans-serif;font-size:15px;cursor:pointer;">'
@@ -2288,7 +2301,8 @@ function handleMcOrRegen(e){
   // MC option buttons
   var mcBtn = e.target.closest('.mc-option-btn');
   if(mcBtn){
-    var actIdx = parseInt(mcBtn.getAttribute('data-actidx'));
+    var actIdxRaw = mcBtn.getAttribute('data-actidx');
+    var actIdx = actIdxRaw === 'field' ? 'field' : parseInt(actIdxRaw);
     var qIdx   = parseInt(mcBtn.getAttribute('data-qidx'));
     var letter = mcBtn.getAttribute('data-letter');
     var ans    = mcBtn.getAttribute('data-ans');
