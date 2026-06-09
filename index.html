@@ -1345,13 +1345,13 @@ function renderActivityCard(el,act,idx){
             var safeFieldAns2=String(q.answer||'').trim().toUpperCase().replace(/"/g,'&quot;');
             var safeHint2=(q.hint||'').replace(/"/g,'&quot;');
             return '<button '
-              +'data-actidx="-1" data-qidx="'+qi+'" data-letter="'+letter+'" '
+              +'data-actidx="'+idx+'" data-qidx="'+qi+'" data-letter="'+letter+'" '
               +'data-ans="'+safeFieldAns2+'" data-hint="'+safeHint2+'" '
-              +'id="mcbtn--1-'+qi+'-'+letter+'" '
-              +'class="mc-option-btn field-mc-btn" '
+              +'id="mcbtn-'+idx+'-'+qi+'-'+letter+'" '
+              +'class="mc-option-btn" '
               +'style="display:block;width:100%;text-align:left;margin-bottom:6px;padding:10px 14px;'
-              +'border:2px solid #3a5c3a;border-radius:10px;background:transparent;'
-              +'color:white;font-family:Nunito,sans-serif;font-size:15px;cursor:pointer;">'
+              +'border:2px solid var(--border);border-radius:10px;background:white;'
+              +'color:var(--text);font-family:Nunito,sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;">'
               +o.trim()+'</button>';
           }).join('');
       return '<div class="ia-q"><p>'+(qi+1)+'. '+qMain+'</p>'
