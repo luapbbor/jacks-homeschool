@@ -1358,10 +1358,12 @@ function renderActivityCard(el,act,idx){
         +optBtns
         +'<div class="ia-fb" id="pq-fb-'+idx+'-'+qi+'"></div></div>';
     } else {
+      var rawAns=(q.answer||'').replace(/"/g,'&quot;');
+      var rawHint=(q.hint||'').replace(/"/g,'&quot;');
       return '<div class="ia-q"><p>'+(qi+1)+'. '+qText+'</p>'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'
         +'<input class="ia-input" type="text" placeholder="Your answer..." id="pq-'+idx+'-'+qi+'">'
-        +'<button class="ia-check" onclick="checkAnswer('+idx+','+qi+',\''+ans+'\',\''+hint+'\')">'+'Check &#10003;</button>'
+        +'<button class="ia-check pq-check-btn" data-actidx="'+idx+'" data-qidx="'+qi+'" data-ans="'+rawAns+'" data-hint="'+rawHint+'">'+'Check &#10003;</button>'
         +'</div><div class="ia-fb" id="pq-fb-'+idx+'-'+qi+'"></div></div>';
     }
   }).join('');
@@ -2273,6 +2275,16 @@ function executePrint(){
 // MC BUTTON EVENT DELEGATION (mobile-safe)
 // ============================================================
 function handleMcOrRegen(e){
+  // Text answer check buttons
+  var pqBtn = e.target.closest('.pq-check-btn');
+  if(pqBtn){
+    var actIdx = parseInt(pqBtn.getAttribute('data-actidx'));
+    var qIdx   = parseInt(pqBtn.getAttribute('data-qidx'));
+    var ans    = pqBtn.getAttribute('data-ans');
+    var hint   = pqBtn.getAttribute('data-hint');
+    checkAnswer(actIdx, qIdx, ans, hint);
+    return;
+  }
   // MC option buttons
   var mcBtn = e.target.closest('.mc-option-btn');
   if(mcBtn){
@@ -2296,7 +2308,7 @@ function handleMcOrRegen(e){
 }
 document.addEventListener('click', handleMcOrRegen);
 document.addEventListener('touchend', function(e){
-  if(e.target.closest('.mc-option-btn')||e.target.closest('.regen-subject-btn')){
+  if(e.target.closest('.pq-check-btn')||e.target.closest('.mc-option-btn')||e.target.closest('.regen-subject-btn')){
     e.preventDefault();
     handleMcOrRegen(e);
   }
