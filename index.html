@@ -2079,10 +2079,12 @@ function renderFieldActivity(){
           }).join('');
           return '<div class="field-q"><p>'+(qi+1)+'. '+qText+'</p>'+optBtns+'<div class="field-q-fb" id="fq-fb-'+qi+'"></div></div>';
         } else {
+          var rawFieldAns=(q.answer||'').replace(/"/g,'&quot;');
+          var rawFieldHint=(q.hint||'').replace(/"/g,'&quot;');
           return '<div class="field-q">'
             +'<p>'+(qi+1)+'. '+(q.question||'')+'</p>'
             +'<input class="field-q-input" type="text" placeholder="Type your answer..." id="fq-'+qi+'">'
-            +'<button class="field-q-check" onclick="checkFieldAnswer('+qi+',\''+ans+'\',\''+hint+'\')">'+'Check Answer</button>'
+            +'<button class="field-q-check field-q-check-btn" data-qidx="'+qi+'" data-ans="'+rawFieldAns+'" data-hint="'+rawFieldHint+'">'+'Check Answer</button>'
             +'<div class="field-q-fb" id="fq-fb-'+qi+'"></div>'
             +'</div>';
         }
@@ -2288,7 +2290,7 @@ function executePrint(){
 // MC BUTTON EVENT DELEGATION (mobile-safe)
 // ============================================================
 function handleMcOrRegen(e){
-  // Text answer check buttons
+  // Text answer check buttons (normal mode)
   var pqBtn = e.target.closest('.pq-check-btn');
   if(pqBtn){
     var actIdx = parseInt(pqBtn.getAttribute('data-actidx'));
@@ -2296,6 +2298,15 @@ function handleMcOrRegen(e){
     var ans    = pqBtn.getAttribute('data-ans');
     var hint   = pqBtn.getAttribute('data-hint');
     checkAnswer(actIdx, qIdx, ans, hint);
+    return;
+  }
+  // Text answer check buttons (field mode)
+  var fqBtn = e.target.closest('.field-q-check-btn');
+  if(fqBtn){
+    var qIdx = parseInt(fqBtn.getAttribute('data-qidx'));
+    var ans  = fqBtn.getAttribute('data-ans');
+    var hint = fqBtn.getAttribute('data-hint');
+    checkFieldAnswer(qIdx, ans, hint);
     return;
   }
   // MC option buttons
@@ -2322,7 +2333,7 @@ function handleMcOrRegen(e){
 }
 document.addEventListener('click', handleMcOrRegen);
 document.addEventListener('touchend', function(e){
-  if(e.target.closest('.pq-check-btn')||e.target.closest('.mc-option-btn')||e.target.closest('.regen-subject-btn')){
+  if(e.target.closest('.pq-check-btn')||e.target.closest('.field-q-check-btn')||e.target.closest('.mc-option-btn')||e.target.closest('.regen-subject-btn')){
     e.preventDefault();
     handleMcOrRegen(e);
   }
