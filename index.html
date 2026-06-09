@@ -1119,6 +1119,33 @@ function calcOutcomeStatusFromSubTopics(outcomeCode){
 }
 
 
+function toggleSubTopic(code, subIndex){
+  if(!state.subTopics[code])state.subTopics[code]={};
+  var current=state.subTopics[code][subIndex];
+  if(current==='done'){
+    delete state.subTopics[code][subIndex];
+    toast('Sub-topic unticked');
+  } else if(current==='skipped'){
+    delete state.subTopics[code][subIndex];
+    toast('Sub-topic reset');
+  } else {
+    state.subTopics[code][subIndex]='done';
+    toast('Sub-topic marked done');
+  }
+  // Recalculate outcome status from sub-topics
+  var newStatus=calcOutcomeStatusFromSubTopics(code);
+  if(newStatus&&newStatus!=='Mastered'){
+    var existing=(state.outcomes[code]&&state.outcomes[code].status)||'Not Started';
+    // Only downgrade if we are not Mastered
+    if(existing!=='Mastered'){
+      if(!state.outcomes[code])state.outcomes[code]={};
+      state.outcomes[code].status=newStatus;
+    }
+  }
+  saveState();
+  renderOutcomes();
+}
+
 function confirmMastered(code){
   if(!confirm('Mark '+code+' as Mastered? This means Jack can do it independently and consistently.'))return;
   var today=new Date().toLocaleDateString('en-AU');
@@ -1305,7 +1332,7 @@ function renderActivityCard(el,act,idx){
 
   var pqHtml=(act.practiceQuestions||[]).map(function(q,qi){
     var qText=q.question||'';
-    var ans=(q.answer||'').replace(/'/g,'&#39;');
+    var ans=(q.answer||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
     var hint=(q.hint||'').replace(/'/g,'&#39;');
     var isMc=q.type==='mc'||(qText.indexOf('A)')>=0&&qText.indexOf('B)')>=0)||String(q.answer||'').match(/^[A-D]$/i);
     if(isMc){
@@ -1392,6 +1419,8 @@ function renderActivityCard(el,act,idx){
 
 function normaliseAnswer(s){
   s=s.trim().toLowerCase().replace(/\s+/g,'');
+  // Decode HTML entities
+  s=s.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/&#(\d+);/g,function(m,c){return String.fromCharCode(c);});
   s=s.replace(/^negative/,'-').replace(/^neg([0-9])/,'-$1');
   s=s.replace(/\.0+$/,'');
   s=s.replace(/[$%]/g,'');
@@ -1620,7 +1649,10 @@ function renderOutcomes(){
         var isDone=stProg.done[si]==='done';
         var isSkip=stProg.done[si]==='skipped';
         var bg=isDone?'var(--accent2)':isSkip?'#f7b731':'var(--border)';
-        return '<div title="'+s+'" style="width:14px;height:14px;border-radius:3px;background:'+bg+';cursor:default"></div>';
+        var clickHandler='toggleSubTopic(\''+o.code+'\','+si+')';
+        return '<div title="'+s+' (click to toggle)" onclick="'+clickHandler+'" '
+          +'style="width:14px;height:14px;border-radius:3px;background:'+bg+';cursor:pointer;transition:opacity .2s" '
+          +'onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1"></div>';
       }).join('')
       +'</div></div>':''
     +(stProg&&od.status==='Covered'?'<button onclick="confirmMastered(\''+o.code+'\')" style="margin-top:6px;padding:3px 8px;background:var(--accent5);color:white;border:none;border-radius:10px;font-size:10px;font-weight:800;cursor:pointer">&#127942; Confirm Mastered</button>':'');
@@ -2014,7 +2046,7 @@ function renderFieldActivity(){
       +'<div style="font-size:14px;font-weight:800;color:#a8e6a8;margin-bottom:10px">Practice Questions</div>'
       +act.practiceQuestions.map(function(q,qi){
         var isMc=q.type==='mc'||(q.question&&q.question.indexOf('A)')>=0&&q.question.indexOf('B)')>=0)||String(q.answer||'').match(/^[A-D]$/i);
-        var ans=(q.answer||'').replace(/'/g,'&#39;');
+        var ans=(q.answer||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
         var hint=(q.hint||'').replace(/'/g,'&#39;');
         if(isMc){
           var lines=(q.question||'').split('\n');
@@ -2071,12 +2103,15 @@ function checkFieldAnswer(qi,correctAnswer,hint){
   var input=document.getElementById('fq-'+qi);
   var fb=document.getElementById('fq-fb-'+qi);
   if(!input||!fb)return;
-  var val=input.value.trim().toLowerCase().replace(/\s/g,'');
-  var correct=correctAnswer.trim().toLowerCase().replace(/\s/g,'');
-  if(val===correct||val===correct.replace(/[^0-9.,-]/g,'')){
+  var val=normaliseAnswer(input.value);
+  var raw=correctAnswer.replace(/&#(\d+);/g,function(m,c){return String.fromCharCode(c);});
+  var acceptableRaw=raw.split('|').map(function(s){return s.trim();});
+  var acceptable=acceptableRaw.map(normaliseAnswer);
+  var isCorrect=acceptable.some(function(a){return val===a;});
+  if(isCorrect){
     fb.className='field-q-fb correct';fb.textContent='Correct! Brilliant work Jack!';
   }else{
-    fb.className='field-q-fb wrong';fb.textContent='Not quite - '+hint+' (Answer: '+correctAnswer+')';
+    fb.className='field-q-fb wrong';fb.textContent='Not quite — '+hint+' (Answer: '+acceptableRaw.join(' or ')+')';
   }
 }
 
@@ -2237,7 +2272,7 @@ function executePrint(){
 // ============================================================
 // MC BUTTON EVENT DELEGATION (mobile-safe)
 // ============================================================
-document.addEventListener('click', function(e){
+function handleMcOrRegen(e){
   // MC option buttons
   var mcBtn = e.target.closest('.mc-option-btn');
   if(mcBtn){
@@ -2257,6 +2292,13 @@ document.addEventListener('click', function(e){
     var actIdx  = parseInt(regenBtn.getAttribute('data-actidx'));
     regenSubjectActivity(day, subject, actIdx);
     return;
+  }
+}
+document.addEventListener('click', handleMcOrRegen);
+document.addEventListener('touchend', function(e){
+  if(e.target.closest('.mc-option-btn')||e.target.closest('.regen-subject-btn')){
+    e.preventDefault();
+    handleMcOrRegen(e);
   }
 });
 
