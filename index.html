@@ -1345,25 +1345,23 @@ function renderActivityCard(el,act,idx){
             var safeFieldAns2=String(q.answer||'').trim().toUpperCase().replace(/"/g,'&quot;');
             var safeHint2=(q.hint||'').replace(/"/g,'&quot;');
             return '<button '
-              +'data-actidx="'+idx+'" data-qidx="'+qi+'" data-letter="'+letter+'" '
+              +'data-actidx="-1" data-qidx="'+qi+'" data-letter="'+letter+'" '
               +'data-ans="'+safeFieldAns2+'" data-hint="'+safeHint2+'" '
-              +'id="mcbtn-'+idx+'-'+qi+'-'+letter+'" '
-              +'class="mc-option-btn" '
+              +'id="mcbtn--1-'+qi+'-'+letter+'" '
+              +'class="mc-option-btn field-mc-btn" '
               +'style="display:block;width:100%;text-align:left;margin-bottom:6px;padding:10px 14px;'
-              +'border:2px solid var(--border);border-radius:10px;background:white;'
-              +'color:var(--text);font-family:Nunito,sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;">'
+              +'border:2px solid #3a5c3a;border-radius:10px;background:transparent;'
+              +'color:white;font-family:Nunito,sans-serif;font-size:15px;cursor:pointer;">'
               +o.trim()+'</button>';
           }).join('');
       return '<div class="ia-q"><p>'+(qi+1)+'. '+qMain+'</p>'
         +optBtns
         +'<div class="ia-fb" id="pq-fb-'+idx+'-'+qi+'"></div></div>';
     } else {
-      var rawAns=(q.answer||'').replace(/"/g,'&quot;');
-      var rawHint=(q.hint||'').replace(/"/g,'&quot;');
       return '<div class="ia-q"><p>'+(qi+1)+'. '+qText+'</p>'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'
         +'<input class="ia-input" type="text" placeholder="Your answer..." id="pq-'+idx+'-'+qi+'">'
-        +'<button class="ia-check pq-check-btn" data-actidx="'+idx+'" data-qidx="'+qi+'" data-ans="'+rawAns+'" data-hint="'+rawHint+'">'+'Check &#10003;</button>'
+        +'<button class="ia-check" onclick="checkAnswer('+idx+','+qi+',\''+ans+'\',\''+hint+'\')">'+'Check &#10003;</button>'
         +'</div><div class="ia-fb" id="pq-fb-'+idx+'-'+qi+'"></div></div>';
     }
   }).join('');
@@ -1433,52 +1431,37 @@ function checkAnswer(actIdx,qIdx,correctAnswer,hint){
   var fb=document.getElementById('pq-fb-'+actIdx+'-'+qIdx);
   if(!input||!fb)return;
   var val=normaliseAnswer(input.value);
-  if(!val){fb.className='ia-fb wrong';fb.textContent='Type your answer first!';return;}
   var acceptableRaw=correctAnswer.split('|').map(function(s){return s.trim();});
   var acceptable=acceptableRaw.map(normaliseAnswer);
-  var isShort=acceptable.every(function(a){return a.length<=20;});
-  if(isShort){
-    var isCorrect=acceptable.some(function(a){return val===a;});
-    if(isCorrect){
-      fb.className='ia-fb correct';fb.textContent='\uD83C\uDF89 Correct! Brilliant work Jack!';
-    }else{
-      fb.className='ia-fb wrong';fb.textContent='Not quite \u2014 '+hint+' (Answer: '+acceptableRaw.join(' or ')+')';
-    }
+  var isCorrect=acceptable.some(function(a){return val===a;});
+  if(isCorrect){
+    fb.className='ia-fb correct';fb.textContent='\uD83C\uDF89 Correct! Brilliant work Jack!';
   }else{
-    fb.className='ia-fb correct';fb.textContent='\u2139\uFE0F Model answer: '+acceptableRaw[0]+(hint?' ('+hint+')':'');
+    fb.className='ia-fb wrong';fb.textContent='Not quite \u2014 '+hint+' (Answer: '+acceptableRaw.join(' or ')+')';
   }
 }
 
 function checkMcAnswer(actIdx,qIdx,selectedLetter,correctLetter,hint){
-  var isField = (actIdx === 'field');
-  var fb = isField
-    ? document.getElementById('fq-fb-'+qIdx)
-    : document.getElementById('pq-fb-'+actIdx+'-'+qIdx);
+  var fb=document.getElementById('pq-fb-'+actIdx+'-'+qIdx);
   if(!fb)return;
   var correct=correctLetter.trim().toUpperCase();
   var selected=selectedLetter.trim().toUpperCase();
   var letters=['A','B','C','D'];
   letters.forEach(function(l){
-    var btnId = isField ? 'mcbtn-field-'+qIdx+'-'+l : 'mcbtn-'+actIdx+'-'+qIdx+'-'+l;
-    var btn=document.getElementById(btnId);
+    var btn=document.getElementById('mcbtn-'+actIdx+'-'+qIdx+'-'+l);
     if(!btn)return;
     if(l===correct){
-      btn.style.background=isField?'#1a5c2a':'#d4edda';
-      btn.style.borderColor='#28a745';
-      btn.style.color=isField?'#a8e6a8':'#155724';
+      btn.style.background='#d4edda';btn.style.borderColor='#28a745';btn.style.color='#155724';
     } else if(l===selected&&selected!==correct){
-      btn.style.background=isField?'#5c1a1a':'#f8d7da';
-      btn.style.borderColor='#dc3545';
-      btn.style.color=isField?'#e6a8a8':'#721c24';
+      btn.style.background='#f8d7da';btn.style.borderColor='#dc3545';btn.style.color='#721c24';
     }
     btn.style.cursor='default';
     btn.onclick=null;
   });
-  var fbClass = isField ? 'field-q-fb' : 'ia-fb';
   if(selected===correct){
-    fb.className=fbClass+' correct';fb.textContent='Correct! Brilliant work Jack!';
+    fb.className='ia-fb correct';fb.textContent='Correct! Brilliant work Jack!';
   } else {
-    fb.className=fbClass+' wrong';fb.textContent='Not quite — '+hint+' (Correct answer: '+correct+')';
+    fb.className='ia-fb wrong';fb.textContent='Not quite — '+hint+' (Correct answer: '+correct+')';
   }
 }
 
@@ -1556,7 +1539,7 @@ async function matchManualActivity(){
   var input=document.getElementById('manualActivityInput');
   var desc=input.value.trim();
   if(!desc){toast('\u26A0\uFE0F Please describe the activity first');return;}
-  if(!state.apiKey){toast('\u26A0\uFE0F Please enter your API key first');return;}
+  if(!state.apiKey){toast('\u26A0\uFE0F Please enter your API key in Settings first');alert('No API key found. Please go to Settings and enter your Anthropic API key.');return;}
   var btn=document.getElementById('manualSubmitBtn');
   btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Matching\u2026';
   var resultsEl=document.getElementById('manualResults');
@@ -1600,7 +1583,7 @@ function renderManualMatches(matches,desc){
       +'</h4>'
       +'<p>'+outcome.desc+'</p>'
       +'<p style="color:var(--accent5);font-size:12px;margin-bottom:8px"><em>'+m.reason+'</em></p>'
-      +'<button class="manual-confirm-btn" onclick="confirmManualActivity(\''+m.code+'\',\''+desc.replace(/'/g,'&#39;').replace(/\n/g,' ')+'\')">+ Log this outcome</button>'
+      +'<button class="manual-confirm-btn" onclick="confirmManualActivity(\''+m.code+'\',\''+desc.replace(/'/g,'&#39;').replace(/"/g,'&quot;').replace(/\n/g,' ')+'\')">+ Log this outcome</button>'
       +'</div>';
   });
   el.innerHTML=html;
@@ -2069,15 +2052,11 @@ function renderFieldActivity(){
           var lines=(q.question||'').split('\n');
           var qText=lines[0];
           var optLines=lines.slice(1);
-          var safeAns2=String(q.answer||'').trim().toUpperCase().replace(/"/g,'&quot;');
-          var safeHint2=(q.hint||'').replace(/"/g,'&quot;');
+          var safeAns=String(q.answer||'').trim().toUpperCase().replace(/'/g,'&#39;');
           var optBtns=optLines.map(function(o){
             var letter=(o.trim().charAt(0)||'A').toUpperCase();
-            return '<button '
-              +'data-actidx="field" data-qidx="'+qi+'" data-letter="'+letter+'" '
-              +'data-ans="'+safeAns2+'" data-hint="'+safeHint2+'" '
-              +'id="mcbtn-field-'+qi+'-'+letter+'" '
-              +'class="mc-option-btn" '
+            return '<button onclick="checkMcAnswer(-1,'+qi+',\''+letter+'\',\''+safeAns+'\',\''+hint+'\')" '
+              +'id="mcbtn--1-'+qi+'-'+letter+'" '
               +'style="display:block;width:100%;text-align:left;margin-bottom:6px;padding:10px 14px;'
               +'border:2px solid #3a5c3a;border-radius:10px;background:transparent;'
               +'color:white;font-family:Nunito,sans-serif;font-size:15px;cursor:pointer;">'
@@ -2085,12 +2064,10 @@ function renderFieldActivity(){
           }).join('');
           return '<div class="field-q"><p>'+(qi+1)+'. '+qText+'</p>'+optBtns+'<div class="field-q-fb" id="fq-fb-'+qi+'"></div></div>';
         } else {
-          var rawFieldAns=(q.answer||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/\n/g,' ').replace(/\r/g,'');
-          var rawFieldHint=(q.hint||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/\n/g,' ').replace(/\r/g,'');
           return '<div class="field-q">'
             +'<p>'+(qi+1)+'. '+(q.question||'')+'</p>'
             +'<input class="field-q-input" type="text" placeholder="Type your answer..." id="fq-'+qi+'">'
-            +'<button class="field-q-check field-q-check-btn" data-qidx="'+qi+'" data-ans="'+rawFieldAns+'" data-hint="'+rawFieldHint+'">'+'Check Answer</button>'
+            +'<button class="field-q-check" onclick="checkFieldAnswer('+qi+',\''+ans+'\',\''+hint+'\')">'+'Check Answer</button>'
             +'<div class="field-q-fb" id="fq-fb-'+qi+'"></div>'
             +'</div>';
         }
@@ -2125,25 +2102,16 @@ function fieldNav(dir){
 function checkFieldAnswer(qi,correctAnswer,hint){
   var input=document.getElementById('fq-'+qi);
   var fb=document.getElementById('fq-fb-'+qi);
-  if(!input||!fb){return;}
+  if(!input||!fb)return;
   var val=normaliseAnswer(input.value);
-  if(!val){fb.className='field-q-fb wrong';fb.textContent='Type your answer first!';return;}
   var raw=correctAnswer.replace(/&#(\d+);/g,function(m,c){return String.fromCharCode(c);});
   var acceptableRaw=raw.split('|').map(function(s){return s.trim();});
   var acceptable=acceptableRaw.map(normaliseAnswer);
-  // For short answers (symbols, numbers, single words) do exact match
-  // For long/open-ended answers, just reveal the answer for self-marking
-  var isShort=acceptable.every(function(a){return a.length<=20;});
-  if(isShort){
-    var isCorrect=acceptable.some(function(a){return val===a;});
-    if(isCorrect){
-      fb.className='field-q-fb correct';fb.textContent='\uD83C\uDF89 Correct! Brilliant work Jack!';
-    }else{
-      fb.className='field-q-fb wrong';fb.textContent='Not quite \u2014 '+hint+' (Answer: '+acceptableRaw.join(' or ')+')';
-    }
+  var isCorrect=acceptable.some(function(a){return val===a;});
+  if(isCorrect){
+    fb.className='field-q-fb correct';fb.textContent='Correct! Brilliant work Jack!';
   }else{
-    // Open-ended: show the answer so Jack can self-mark
-    fb.className='field-q-fb correct';fb.textContent='\u2139\uFE0F Model answer: '+acceptableRaw[0]+(hint?' ('+hint+')':'');
+    fb.className='field-q-fb wrong';fb.textContent='Not quite — '+hint+' (Answer: '+acceptableRaw.join(' or ')+')';
   }
 }
 
@@ -2305,30 +2273,10 @@ function executePrint(){
 // MC BUTTON EVENT DELEGATION (mobile-safe)
 // ============================================================
 function handleMcOrRegen(e){
-  // Text answer check buttons (normal mode)
-  var pqBtn = e.target.closest('.pq-check-btn');
-  if(pqBtn){
-    var actIdx = parseInt(pqBtn.getAttribute('data-actidx'));
-    var qIdx   = parseInt(pqBtn.getAttribute('data-qidx'));
-    var ans    = pqBtn.getAttribute('data-ans');
-    var hint   = pqBtn.getAttribute('data-hint');
-    checkAnswer(actIdx, qIdx, ans, hint);
-    return;
-  }
-  // Text answer check buttons (field mode)
-  var fqBtn = e.target.closest('.field-q-check-btn');
-  if(fqBtn){
-    var qIdx = parseInt(fqBtn.getAttribute('data-qidx'));
-    var ans  = fqBtn.getAttribute('data-ans');
-    var hint = fqBtn.getAttribute('data-hint');
-    checkFieldAnswer(qIdx, ans, hint);
-    return;
-  }
   // MC option buttons
   var mcBtn = e.target.closest('.mc-option-btn');
   if(mcBtn){
-    var actIdxRaw = mcBtn.getAttribute('data-actidx');
-    var actIdx = actIdxRaw === 'field' ? 'field' : parseInt(actIdxRaw);
+    var actIdx = parseInt(mcBtn.getAttribute('data-actidx'));
     var qIdx   = parseInt(mcBtn.getAttribute('data-qidx'));
     var letter = mcBtn.getAttribute('data-letter');
     var ans    = mcBtn.getAttribute('data-ans');
@@ -2348,7 +2296,7 @@ function handleMcOrRegen(e){
 }
 document.addEventListener('click', handleMcOrRegen);
 document.addEventListener('touchend', function(e){
-  if(e.target.closest('.pq-check-btn')||e.target.closest('.field-q-check-btn')||e.target.closest('.mc-option-btn')||e.target.closest('.regen-subject-btn')){
+  if(e.target.closest('.mc-option-btn')||e.target.closest('.regen-subject-btn')){
     e.preventDefault();
     handleMcOrRegen(e);
   }
