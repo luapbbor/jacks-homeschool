@@ -1350,8 +1350,8 @@ function renderActivityCard(el,act,idx){
               +'id="mcbtn--1-'+qi+'-'+letter+'" '
               +'class="mc-option-btn field-mc-btn" '
               +'style="display:block;width:100%;text-align:left;margin-bottom:6px;padding:10px 14px;'
-              +'border:2px solid #3a5c3a;border-radius:10px;background:transparent;'
-              +'color:white;font-family:Nunito,sans-serif;font-size:15px;cursor:pointer;">'
+              +'border:2px solid #ccc;border-radius:10px;background:transparent;'
+              +'color:var(--text);font-family:Nunito,sans-serif;font-size:15px;cursor:pointer;">'
               +o.trim()+'</button>';
           }).join('');
       return '<div class="ia-q"><p>'+(qi+1)+'. '+qMain+'</p>'
@@ -1442,7 +1442,7 @@ function checkAnswer(actIdx,qIdx,correctAnswer,hint){
 }
 
 function checkMcAnswer(actIdx,qIdx,selectedLetter,correctLetter,hint){
-  var fb=document.getElementById('pq-fb-'+actIdx+'-'+qIdx);
+  var fb=document.getElementById('pq-fb-'+actIdx+'-'+qIdx)||document.getElementById('fq-fb-'+qIdx);
   if(!fb)return;
   var correct=correctLetter.trim().toUpperCase();
   var selected=selectedLetter.trim().toUpperCase();
