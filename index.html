@@ -1241,7 +1241,10 @@ async function generateDay(day,silent){
     var carryOver=isCarryOverStillValid(storedCarry)?storedCarry:null;
     if(storedCarry&&!carryOver){delete state.carryOvers[carryKey];saveState();}
     var subjectOutcomes=OUTCOMES.filter(function(o){return o.subject===subject;});
-    var outcome=subjectOutcomes.find(function(o){return (state.outcomes[o.code]&&state.outcomes[o.code].status||'Not Started')!=='Mastered';})||subjectOutcomes[subjectOutcomes.length-1];
+    var outcome=subjectOutcomes.find(function(o){
+      var st=(state.outcomes[o.code]&&state.outcomes[o.code].status)||'Not Started';
+      return st!=='Covered'&&st!=='Mastered';
+    })||subjectOutcomes[subjectOutcomes.length-1];
     try{
       var activity=await callGenerateAPI(day,subject,outcome,carryOver);
       var _stInfo=getNextSubTopic(outcome.code);
@@ -2142,7 +2145,10 @@ async function regenSubjectActivity(day, subject, actIdx){
     cards[actIdx].innerHTML='<div class="loading-activity"><div class="spinner"></div> Regenerating '+subject+' activity for '+day+'...</div>';
   }
   var subjectOutcomes=OUTCOMES.filter(function(o){return o.subject===subject;});
-  var outcome=subjectOutcomes.find(function(o){return (state.outcomes[o.code]&&state.outcomes[o.code].status||'Not Started')!=='Mastered';});
+  var outcome=subjectOutcomes.find(function(o){
+    var st=(state.outcomes[o.code]&&state.outcomes[o.code].status)||'Not Started';
+    return st!=='Covered'&&st!=='Mastered';
+  });
   if(!outcome)outcome=subjectOutcomes[subjectOutcomes.length-1];
   try{
     var activity=await callGenerateAPI(day,subject,outcome,null);
