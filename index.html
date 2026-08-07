@@ -1336,7 +1336,7 @@ function renderActivityCard(el,act,idx){
   var pqHtml=(act.practiceQuestions||[]).map(function(q,qi){
     var qText=q.question||'';
     var ans=(q.answer||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
-    var hint=(q.hint||'').replace(/'/g,'&#39;');
+    var hint=(q.hint||'').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
     var isMc=q.type==='mc'||(qText.indexOf('A)')>=0&&qText.indexOf('B)')>=0)||String(q.answer||'').match(/^[A-D]$/i);
     if(isMc){
       var lines=qText.split('\n');
@@ -2050,7 +2050,7 @@ function renderFieldActivity(){
       +act.practiceQuestions.map(function(q,qi){
         var isMc=q.type==='mc'||(q.question&&q.question.indexOf('A)')>=0&&q.question.indexOf('B)')>=0)||String(q.answer||'').match(/^[A-D]$/i);
         var ans=(q.answer||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
-        var hint=(q.hint||'').replace(/'/g,'&#39;');
+        var hint=(q.hint||'').replace(/'/g,'&#39;').replace(/"/g,'&quot;');
         if(isMc){
           var lines=(q.question||'').split('\n');
           var qText=lines[0];
